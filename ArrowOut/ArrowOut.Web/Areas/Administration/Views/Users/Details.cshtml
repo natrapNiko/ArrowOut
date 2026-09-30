@@ -1,0 +1,56 @@
+@model UserListItem
+@{
+    ViewData["Title"] = Model.Email;
+    var isSelf = Model.Id == Context.User.GetRequiredUserId();
+}
+
+<a asp-action="Index" class="small"><i class="bi bi-chevron-left"></i> All users</a>
+<div class="ao-card p-4 mt-2" style="max-width: 40rem">
+    <h1 class="h4 mb-1">@Model.PublicName</h1>
+    <p class="text-muted mb-3">@Model.Email</p>
+
+    <dl class="row small mb-4">
+        <dt class="col-5">Joined</dt><dd class="col-7">@Model.CreatedOn.ToString("yyyy-MM-dd HH:mm") UTC</dd>
+        <dt class="col-5">Levels cleared</dt><dd class="col-7">@Model.CompletedLevels</dd>
+        <dt class="col-5">Role</dt><dd class="col-7">@(Model.IsAdministrator ? "Administrator" : "Player")</dd>
+        <dt class="col-5">Status</dt><dd class="col-7">@(Model.IsLockedOut ? "Locked" : "Active")</dd>
+    </dl>
+
+    @if (isSelf)
+    {
+        <p class="text-muted small mb-0">You cannot lock, demote or delete your own account here.</p>
+    }
+    else
+    {
+        <div class="d-flex flex-wrap gap-2">
+            <form asp-action="@(Model.IsLockedOut ? "Unlock" : "Lock")" asp-route-id="@Model.Id" method="post">
+                <button class="btn btn-sm btn-outline-warning" type="submit">
+                    <i class="bi @(Model.IsLockedOut ? "bi-unlock" : "bi-lock") me-1"></i>@(Model.IsLockedOut ? "Unlock" : "Lock")
+                </button>
+            </form>
+            <form asp-action="@(Model.IsAdministrator ? "Demote" : "Promote")" asp-route-id="@Model.Id" method="post">
+                <button class="btn btn-sm btn-outline-ao" type="submit">
+                    <i class="bi bi-shield me-1"></i>@(Model.IsAdministrator ? "Remove admin" : "Make admin")
+                </button>
+            </form>
+            <button class="btn btn-sm btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
+                <i class="bi bi-trash me-1"></i>Delete
+            </button>
+        </div>
+
+        <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header"><h2 class="modal-title h5" id="deleteUserTitle">Delete user?</h2></div>
+                    <div class="modal-body">This permanently deletes <strong>@Model.Email</strong> and all of their progress.</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,14 @@
+@model ErrorViewModel
+<div class="ao-error text-center py-5">
+    <div class="ao-error-code" aria-hidden="true">@Model.StatusCode</div>
+    <h1 class="h3 mb-2">@Model.Title</h1>
+    <p class="text-muted mx-auto" style="max-width: 32rem">@Model.Message</p>
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        <a class="btn btn-ao" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-house me-1"></i>Home</a>
+        <a class="btn btn-outline-ao" asp-area="" asp-controller="Leaderboard" asp-action="Index">Leaderboard</a>
+    </div>
+    @if (!string.IsNullOrEmpty(Model.RequestId))
+    {
+        <p class="small text-muted mt-4 mb-0">Reference: <code>@Model.RequestId</code></p>
+    }
+</div>

@@ -1,0 +1,72 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Create account";
+}
+
+<div class="ao-auth">
+    <partial name="_AuthAside" model='new AuthAsideModel("Join the challenge.", "Free to play. One tap per arrow, hundreds of arrows per board — and every board is guaranteed solvable.")' />
+
+    <section class="ao-auth-main">
+        <a class="ao-auth-mobile-brand d-md-none" asp-area="" asp-controller="Home" asp-action="Index">
+            <span class="ao-brand-mark" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span>
+            ArrowOut
+        </a>
+
+        <h1 class="ao-auth-title">Create account</h1>
+        <p class="ao-auth-subtitle">
+            Already playing?
+            <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Sign in</a>
+        </p>
+
+        <form id="registerForm" method="post" asp-route-returnUrl="@Model.ReturnUrl" novalidate>
+            <div asp-validation-summary="ModelOnly" class="ao-auth-alert" role="alert"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.DisplayName" class="form-control" autocomplete="nickname" placeholder="Your name" />
+                <label asp-for="Input.DisplayName"></label>
+                <div class="ao-field-hint">Shown on the leaderboard instead of your email.</div>
+                <span asp-validation-for="Input.DisplayName" class="ao-field-error"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" type="email" autocomplete="email" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Email"></label>
+                <span asp-validation-for="Input.Email" class="ao-field-error"></span>
+            </div>
+
+            <div class="form-floating mb-2 ao-password">
+                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" aria-describedby="passwordRules" placeholder="Password" />
+                <label asp-for="Input.Password"></label>
+                <button type="button" class="ao-password-toggle" data-password-toggle aria-label="Show password"><i class="bi bi-eye"></i></button>
+                <span asp-validation-for="Input.Password" class="ao-field-error"></span>
+            </div>
+
+            <ul class="ao-password-rules" id="passwordRules" data-password-rules="#Input_Password">
+                <li data-rule="length"><i class="bi bi-check-circle-fill" aria-hidden="true"></i> 8+ characters</li>
+                <li data-rule="upper"><i class="bi bi-check-circle-fill" aria-hidden="true"></i> Uppercase letter</li>
+                <li data-rule="lower"><i class="bi bi-check-circle-fill" aria-hidden="true"></i> Lowercase letter</li>
+                <li data-rule="digit"><i class="bi bi-check-circle-fill" aria-hidden="true"></i> Number</li>
+            </ul>
+
+            <div class="form-floating mb-4 ao-password">
+                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Repeat password" />
+                <label asp-for="Input.ConfirmPassword"></label>
+                <button type="button" class="ao-password-toggle" data-password-toggle aria-label="Show password"><i class="bi bi-eye"></i></button>
+                <span asp-validation-for="Input.ConfirmPassword" class="ao-field-error"></span>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="btn btn-ao btn-lg w-100 ao-auth-submit">
+                Create account <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+            </button>
+        </form>
+
+        <p class="ao-auth-footnote">
+            By creating an account you agree to our <a asp-area="" asp-controller="Home" asp-action="Privacy">privacy notice</a>.
+        </p>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

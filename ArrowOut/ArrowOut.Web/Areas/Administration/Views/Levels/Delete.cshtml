@@ -1,0 +1,16 @@
+@model LevelInputModel
+@{
+    ViewData["Title"] = $"Delete level {Model.Number}";
+}
+
+<div class="ao-card p-4 mx-auto" style="max-width: 32rem">
+    <h1 class="h4">Delete level @Model.Number?</h1>
+    <p>
+        <strong>@Model.Name</strong> (@Model.Width×@Model.Height) and all player progress on it will be removed permanently.
+        Consider unpublishing it instead.
+    </p>
+    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger"><i class="bi bi-trash me-1"></i>Delete</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+    </form>
+</div>

@@ -1,0 +1,462 @@
+/* The cartoon look. Loaded last on every page: thick outlines, hard shadows, bouncy fonts and
+   bright colours. It works with any theme. In light mode the outlines use the theme's text
+   colour, in dark mode they're almost black. */
+
+/* Fonts: the CSP only allows fonts from our own site (font-src 'self'), so web fonts would have
+   to be hosted here. Until someone adds "Luckiest Guy" / "Fredoka" .woff2 files under
+   wwwroot/lib/fonts (with @font-face rules here), these fall back to rounded or comic fonts
+   that come with the system: Comic Sans MS and Arial Rounded on Windows, Chalkboard SE and
+   Marker Felt on Apple. */
+
+:root {
+    --toon-ink: var(--ao-text);
+    --toon-line: 3px;
+    --toon-border: var(--toon-line) solid var(--toon-ink);
+    --toon-shadow: 5px 5px 0 var(--toon-ink);
+    --toon-shadow-sm: 3px 3px 0 var(--toon-ink);
+    --toon-shadow-lg: 8px 8px 0 var(--toon-ink);
+    --toon-radius: 18px;
+
+    /* Extra "crayon" colours for decoration. They're not part of any theme. */
+    --toon-yellow: #ffd23f;
+    --toon-teal: #22c7c7;
+    --toon-purple: #8b5cf6;
+    --toon-orange: #ff8a3d;
+    --toon-lime: #9be15d;
+    --toon-on-bright: #3b1f14; /* text on the crayon colours, same in every theme (dark brown) */
+
+    --toon-font-display: "Luckiest Guy", "Bangers", "Comic Sans MS", "Chalkboard SE", "Marker Felt", "Arial Rounded MT Bold", system-ui, sans-serif;
+    --toon-font-body: "Fredoka", "Nunito", "Arial Rounded MT Bold", "Chalkboard SE", "Trebuchet MS", system-ui, sans-serif;
+
+    --ao-radius: 16px;
+    --bs-body-font-family: var(--toon-font-body);
+}
+
+/* Dark mode: black outlines and shadows (light ones look too bright on a dark page). Either the
+   player picked dark, or they haven't picked and their device is in dark mode. */
+:root[data-mode="dark"] {
+    --toon-ink: #140d0a;
+    --toon-sticker-text: var(--toon-on-bright);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-mode]) {
+        --toon-ink: #140d0a;
+        --toon-sticker-text: var(--toon-on-bright);
+    }
+}
+
+/* ---------- Page ---------- */
+
+body {
+    font-family: var(--toon-font-body);
+    background-color: var(--ao-bg);
+}
+
+h1, h2, h3, .h1, .h2, .h3, .display-5,
+.ao-brand, .ao-kind-name, .ao-auth-title, .ao-auth-aside-title,
+.ao-game-level, .ao-win-time-value, .ao-win-points-value, .ao-error-code, .ao-level-number {
+    font-family: var(--toon-font-display);
+    font-weight: 400;
+    letter-spacing: .02em;
+}
+
+h1, .h1, .display-5 {
+    text-shadow: 3px 3px 0 var(--toon-yellow);
+}
+
+/* Dark mode: cream titles with a black shadow. */
+:root[data-mode="dark"] h1, :root[data-mode="dark"] .display-5 { text-shadow: 3px 3px 0 var(--toon-ink); }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-mode]) h1, :root:not([data-mode]) .display-5 { text-shadow: 3px 3px 0 var(--toon-ink); }
+}
+
+.lead { font-weight: 500; }
+
+a { font-weight: 600; text-underline-offset: .2em; }
+/* Normal text links get a plain underline on hover. Buttons, tabs and menu links that happen to
+   be <a> tags don't, they have their own hover effects. */
+a:hover { text-decoration: none; }
+a:not(.btn, .nav-link, .page-link, .dropdown-item, .navbar-brand, [class*="ao-"]):hover {
+    text-decoration: underline 2px;
+}
+
+/* ---------- Chunky outlined surfaces ---------- */
+
+.ao-card, .ao-feature, .ao-progress-card, .ao-stat, .ao-kind-card, .ao-auth, .ao-board,
+.modal-content, .dropdown-menu, .ao-level-card, .ao-empty {
+    border: var(--toon-border);
+    border-radius: var(--toon-radius);
+    box-shadow: var(--toon-shadow);
+}
+
+.ao-empty { background: var(--ao-surface); padding: 2.5rem 1rem !important; }
+
+.ao-feature { transition: transform .15s ease; }
+.ao-feature:hover { transform: rotate(-1deg) translateY(-3px); }
+.ao-feature:hover i { animation: toon-wiggle .5s ease; }
+.ao-feature i {
+    display: inline-grid;
+    place-items: center;
+    width: 2.8rem;
+    height: 2.8rem;
+    border: var(--toon-border);
+    border-radius: 14px;
+    background: var(--toon-yellow);
+    color: var(--toon-on-bright);
+    box-shadow: var(--toon-shadow-sm);
+}
+.row > .col:nth-child(2) .ao-feature i { background: var(--toon-teal); }
+.row > .col:nth-child(3) .ao-feature i { background: var(--ao-accent); }
+
+/* ---------- Navigation ---------- */
+
+.ao-navbar {
+    background: var(--ao-surface);
+    backdrop-filter: none;
+    border-bottom: var(--toon-border);
+    box-shadow: 0 4px 0 var(--toon-ink);
+}
+
+.ao-navbar .nav-link { font-weight: 600; border-radius: 12px; padding-inline: .7rem !important; }
+.ao-navbar .nav-link:hover { background: var(--toon-yellow); color: var(--toon-on-bright); text-decoration: none; }
+
+.ao-brand-mark {
+    background: var(--toon-yellow);
+    color: var(--toon-on-bright);
+    border: var(--toon-border);
+    box-shadow: 2px 2px 0 var(--toon-ink);
+    transform: rotate(-8deg);
+    transition: transform .2s cubic-bezier(.2, 1.6, .4, 1);
+}
+.ao-brand { font-size: 1.45rem; }
+.ao-brand:hover .ao-brand-mark { transform: rotate(8deg) scale(1.1); }
+
+.ao-footer { border-top: var(--toon-border); background: var(--ao-surface); font-weight: 500; }
+
+/* ---------- Buttons: press-down cartoon buttons ---------- */
+
+.btn-ao, .btn-outline-ao {
+    border: var(--toon-border) !important;
+    box-shadow: 4px 4px 0 var(--toon-ink);
+    font-family: var(--toon-font-display);
+    letter-spacing: .04em;
+    font-weight: 400;
+    transition: transform .08s ease, box-shadow .08s ease, background-color .15s ease;
+}
+
+.btn-ao {
+    --bs-btn-color: var(--toon-on-bright);
+    --bs-btn-bg: var(--toon-yellow);
+    --bs-btn-hover-color: var(--toon-on-bright);
+    --bs-btn-hover-bg: #ffe066;
+    --bs-btn-active-color: var(--toon-on-bright);
+    --bs-btn-active-bg: var(--toon-yellow);
+    --bs-btn-disabled-color: var(--toon-on-bright);
+    --bs-btn-disabled-bg: var(--toon-yellow);
+}
+
+.btn-outline-ao {
+    --bs-btn-color: var(--ao-text);
+    --bs-btn-bg: var(--ao-surface);
+    --bs-btn-hover-color: var(--toon-on-bright);
+    --bs-btn-hover-bg: var(--toon-teal);
+    --bs-btn-active-color: var(--toon-on-bright);
+    --bs-btn-active-bg: var(--toon-teal);
+    background: var(--ao-surface);
+}
+
+.btn-ao:hover, .btn-outline-ao:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--toon-ink); }
+.btn-ao:active, .btn-outline-ao:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--toon-ink); }
+
+.btn-icon {
+    border: 2.5px solid var(--toon-ink);
+    background: var(--ao-surface);
+    box-shadow: 2px 2px 0 var(--toon-ink);
+    transition: transform .08s ease, box-shadow .08s ease, background-color .15s ease;
+}
+.btn-icon:hover { background: var(--toon-yellow); color: var(--toon-on-bright); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--toon-ink); }
+.btn-icon:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--toon-ink); }
+.btn-icon:disabled { opacity: .45; box-shadow: none; }
+#gridButton[aria-pressed="true"] { background: var(--toon-teal); color: var(--toon-on-bright); }
+
+.ao-hint-count { border: 2px solid var(--toon-ink); background: var(--ao-accent); color: var(--toon-sticker-text, #fff); font-weight: 700; }
+
+/* ---------- Forms ---------- */
+
+.form-control, .form-select {
+    border: var(--toon-border);
+    border-radius: 14px;
+    font-weight: 500;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--toon-ink);
+    box-shadow: 4px 4px 0 var(--ao-accent);
+}
+.form-check-input { border: 2.5px solid var(--toon-ink); }
+.ao-auth .form-floating > .form-control { border-radius: 14px; }
+
+/* ---------- Challenge cards & badges: stickers ---------- */
+
+.ao-kind-picker { gap: 1.4rem; }
+
+.ao-kind-card {
+    background: color-mix(in srgb, var(--kind) 16%, var(--ao-surface));
+    border-color: var(--toon-ink);
+    transition: transform .18s cubic-bezier(.2, 1.6, .4, 1), box-shadow .12s ease;
+}
+.ao-kind-picker form:nth-child(1) .ao-kind-card { transform: rotate(-1.5deg); }
+.ao-kind-picker form:nth-child(2) .ao-kind-card { transform: rotate(1deg); }
+.ao-kind-picker form:nth-child(3) .ao-kind-card { transform: rotate(-.8deg); }
+/* Same specificity as the tilt rules above, so hovering straightens the card. */
+.ao-kind-picker form .ao-kind-card:hover,
+.ao-kind-picker form .ao-kind-card:focus-visible {
+    transform: rotate(0) translate(-3px, -4px) scale(1.02);
+    border-color: var(--toon-ink);
+    box-shadow: var(--toon-shadow-lg);
+}
+.ao-kind-picker form .ao-kind-card:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--toon-ink); }
+
+.ao-kind-icon {
+    background: var(--kind);
+    color: var(--toon-sticker-text, #fff);
+    border: var(--toon-border);
+    box-shadow: var(--toon-shadow-sm);
+    font-size: 1.35rem;
+}
+.ao-kind-card:hover .ao-kind-icon { animation: toon-wiggle .5s ease; }
+.ao-kind-name { font-size: 1.6rem; }
+.ao-kind-arrows, .ao-kind-go { font-weight: 700; }
+.ao-kind-points {
+    align-self: flex-start;
+    margin-top: .6rem;
+    padding: .1rem .6rem;
+    border: 2px solid var(--toon-ink);
+    border-radius: 999px;
+    background: var(--toon-yellow);
+    color: var(--toon-on-bright);
+    font-size: .8rem;
+    font-weight: 700;
+    box-shadow: 2px 2px 0 var(--toon-ink);
+}
+.ao-kind-go { font-family: var(--toon-font-display); letter-spacing: .04em; font-weight: 400; font-size: 1rem; }
+#pickerModal .ao-kind-card { box-shadow: var(--toon-shadow); }
+
+.ao-kind-badge {
+    background: var(--kind);
+    color: var(--toon-sticker-text, #fff);
+    border: 2px solid var(--toon-ink);
+    box-shadow: 2px 2px 0 var(--toon-ink);
+    transform: rotate(-4deg);
+    font-family: var(--toon-font-display);
+    letter-spacing: .06em;
+    font-weight: 400;
+    font-size: .75rem;
+}
+
+/* Leaderboard tabs */
+.ao-kind-tabs { background: var(--ao-surface); border: var(--toon-border); box-shadow: var(--toon-shadow); }
+.ao-kind-tab { font-family: var(--toon-font-display); letter-spacing: .04em; font-weight: 400; font-size: 1.05rem; border: 2.5px solid transparent; }
+.ao-kind-tab small { font-family: var(--toon-font-body); letter-spacing: 0; font-weight: 600; }
+.ao-kind-tab.is-active { background: var(--kind); color: var(--toon-sticker-text, #fff); border-color: var(--toon-ink); box-shadow: var(--toon-shadow-sm); }
+.ao-kind-tab.is-active small { opacity: 1; }
+
+/* ---------- Tables, medals, stats ---------- */
+
+.ao-table thead th { font-family: var(--toon-font-display); font-weight: 400; letter-spacing: .05em; font-size: .95rem; color: var(--ao-text); border-bottom: var(--toon-border); }
+.ao-table tbody tr + tr td { border-top: 2px dashed color-mix(in srgb, var(--toon-ink) 25%, transparent); }
+.ao-medal { border: 2.5px solid var(--toon-ink); box-shadow: 2px 2px 0 var(--toon-ink); font-family: var(--toon-font-display); font-weight: 400; color: var(--toon-on-bright); }
+
+.ao-progress-card { font-weight: 500; }
+
+/* ---------- Game ---------- */
+
+.ao-board { border-width: 4px; box-shadow: var(--toon-shadow-lg); }
+.ao-game-level { font-size: 1.5rem; }
+.ao-game-timer {
+    font-family: var(--toon-font-display);
+    letter-spacing: .06em;
+    font-weight: 400;
+    font-size: 1.15rem;
+    color: var(--ao-text);
+    padding: .15rem .8rem;
+    border: 2.5px solid var(--toon-ink);
+    border-radius: 999px;
+    background: var(--ao-surface);
+    box-shadow: 2px 2px 0 var(--toon-ink);
+}
+.ao-lives { font-size: 1.45rem; filter: drop-shadow(1.5px 1.5px 0 var(--toon-ink)); }
+
+/* ---------- Arrows: drawn with a soft black pencil ---------- */
+
+/* Pencil on paper. In dark mode it's a white pencil instead, since black wouldn't show up. */
+:root { --toon-pencil: #111; }
+:root[data-mode="dark"] { --toon-pencil: color-mix(in srgb, var(--ao-arrow) 60%, #fff); }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-mode]) { --toon-pencil: color-mix(in srgb, var(--ao-arrow) 60%, #fff); }
+}
+
+.ao-arrow { --pencil: var(--toon-pencil); --pencil-w: 6px; }
+.ao-game-challenge .ao-arrow { --pencil-w: 5.5px; }
+.ao-hero-demo .ao-arrow { --pencil-w: 7px; }
+
+/* Hover, hint and crash colours change the whole arrow (line, second stroke and head) through one variable. */
+@media (hover: hover) {
+    .ao-arrow:hover { --pencil: var(--ao-accent); }
+}
+.ao-arrow:focus-visible { --pencil: var(--ao-accent); }
+.ao-arrow.is-hint { --pencil: var(--ao-success); }
+.ao-arrow.is-blocked,
+.ao-arrow.is-blocker,
+.ao-board-editor .ao-arrow.is-stuck { --pencil: var(--ao-danger); }
+
+.ao-arrow .ao-arrow-body,
+.ao-game-challenge .ao-arrow .ao-arrow-body { stroke: var(--pencil); stroke-width: var(--pencil-w); }
+
+.ao-arrow .ao-arrow-head path {
+    fill: none;
+    stroke: var(--pencil);
+    stroke-width: var(--pencil-w);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* The faint second pencil stroke, on the line and on the head. */
+.ao-arrow .ao-arrow-sketch,
+.ao-arrow .ao-arrow-head .ao-arrow-sketch {
+    display: inline;
+    stroke: var(--pencil);
+    stroke-width: calc(var(--pencil-w) * .35);
+    stroke-opacity: .6;
+}
+
+/* Grain and wobble (only small boards get the filter, big ones would get laggy). */
+.is-sketchy .ao-arrows { filter: url(#ao-pencil); }
+
+/* ---------- Dialogs: pop in with a boing ---------- */
+
+.modal-content { border-width: 4px; box-shadow: var(--toon-shadow-lg); }
+.modal.show .modal-dialog { animation: toon-pop .45s cubic-bezier(.2, 1.6, .4, 1); }
+.modal-backdrop.show { opacity: .55; }
+
+/* Win: a spinning sunburst behind a yellow sticker with a check mark. The badge has its own
+   stacking context (isolation), so from back to front it's: rays (::before), yellow circle
+   (::after), then the check mark icon. */
+.ao-win-burst {
+    position: relative;
+    isolation: isolate;
+    display: inline-grid;
+    place-items: center;
+    width: 5rem;
+    height: 5rem;
+    margin-top: -3.2rem;
+    color: var(--toon-on-bright);
+}
+.ao-win-burst::before,
+.ao-win-burst::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+}
+.ao-win-burst::before {
+    inset: -1.1rem;
+    z-index: -2;
+    background: repeating-conic-gradient(var(--ao-accent) 0 12deg, transparent 12deg 30deg);
+    animation: toon-spin 8s linear infinite;
+    opacity: .75;
+}
+.ao-win-burst::after {
+    inset: 0;
+    z-index: -1;
+    border: var(--toon-border);
+    background: var(--toon-yellow);
+    box-shadow: var(--toon-shadow-sm);
+}
+.ao-fail-icon, .ao-confirm-icon { filter: drop-shadow(2px 2px 0 var(--toon-ink)); }
+
+.ao-win-time-value { font-size: 3rem; text-shadow: 3px 3px 0 var(--toon-yellow); }
+.ao-win-points-value {
+    display: inline-block;
+    padding: .1rem .9rem;
+    border: var(--toon-border);
+    border-radius: 999px;
+    background: var(--toon-lime);
+    color: var(--toon-on-bright);
+    box-shadow: var(--toon-shadow-sm);
+    transform: rotate(-3deg);
+    font-size: 1.4rem;
+}
+.ao-win-stars .is-earned { filter: drop-shadow(2px 2px 0 var(--toon-ink)); }
+
+/* ---------- Home hero: the self-playing labyrinth (home-demo.js) ---------- */
+
+.ao-hero-demo {
+    width: min(300px, 76vw);
+    aspect-ratio: 1 / 1;
+    padding: 14px;
+    background: var(--ao-surface);
+    border: 4px solid var(--toon-ink);
+    border-radius: 22px;
+    box-shadow: var(--toon-shadow-lg);
+    transform: rotate(-2deg);
+    pointer-events: none; /* just decoration, nothing to click */
+}
+
+.ao-hero-demo svg { width: 100%; height: 100%; display: block; overflow: hidden; }
+.ao-hero-demo .ao-grid-lines { display: none; } /* just the arrows, no grid */
+
+/* A new round pops in, a finished one shrinks away. */
+.ao-hero-demo.is-entering-round svg { animation: toon-pop .55s cubic-bezier(.2, 1.6, .4, 1); }
+.ao-hero-demo.is-leaving-round svg { transform: scale(.85) rotate(4deg); opacity: 0; transition: transform .6s ease, opacity .6s ease; }
+
+/* ---------- Sign in / create account ---------- */
+
+/* The side panel looks like graph paper with the maze drawn on it in pencil, same as the game board. */
+.ao-auth-aside {
+    color: var(--toon-pencil);
+    background-color: color-mix(in srgb, var(--ao-surface) 88%, #f3e9d2);
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--toon-pencil) 9%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--toon-pencil) 9%, transparent) 1px, transparent 1px);
+    background-size: 22px 22px;
+    border-right: var(--toon-border);
+}
+.ao-auth-aside-brand,
+.ao-auth-aside-brand:hover { color: var(--toon-pencil); }
+.ao-auth-aside-brand .ao-brand-mark { background: var(--toon-yellow); color: var(--toon-on-bright); }
+.ao-auth-aside-title { font-size: 2.3rem; color: var(--toon-pencil); }
+.ao-auth-aside-text { color: color-mix(in srgb, var(--toon-pencil) 78%, transparent); }
+.ao-auth-aside-facts { color: color-mix(in srgb, var(--toon-pencil) 90%, transparent); }
+
+.ao-auth-maze-lines { filter: url(#ao-auth-pencil); }
+.ao-auth-maze path { stroke: var(--toon-pencil); stroke-width: 2.8; }
+.ao-auth-maze .ao-maze-sketch { display: inline; stroke-width: 1; stroke-opacity: .6; }
+.ao-auth-alert:not(.validation-summary-valid) { border: 2.5px solid var(--ao-danger); }
+.ao-password-toggle { border-radius: 10px; }
+
+@media (max-width: 767.98px) {
+    .ao-auth-aside { border-right: 0; }
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes toon-pop {
+    0% { transform: scale(.7) rotate(-3deg); opacity: 0; }
+    100% { transform: none; opacity: 1; }
+}
+
+@keyframes toon-wiggle {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(-12deg); }
+    50% { transform: rotate(10deg); }
+    75% { transform: rotate(-6deg); }
+}
+
+@keyframes toon-spin { to { transform: rotate(360deg); } }
+
+/* The leaderboard link in the win dialog gets a gold trophy, so it's clear it shows your rank. */
+.ao-win-leaderboard i { color: #e0a800; }
+.ao-win-leaderboard:hover i { color: var(--toon-on-bright); }
+
+/* Leaderboard: buttons to get back into the game. */
+.ao-leaderboard-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }

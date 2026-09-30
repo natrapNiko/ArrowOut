@@ -1,0 +1,170 @@
+/* Game board and editor. In the SVG one cell is 60 units. */
+
+.ao-game {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.ao-game-header,
+.ao-game-toolbar,
+.ao-game-footer { display: flex; align-items: center; gap: .75rem; }
+
+.ao-game-title { flex: 1; min-width: 0; text-align: center; }
+.ao-game-level { font-weight: 700; font-size: 1.15rem; line-height: 1.1; }
+.ao-game-name { font-size: .85rem; color: var(--ao-muted); }
+
+.ao-lives { display: flex; gap: .25rem; color: var(--ao-danger); font-size: 1.2rem; min-width: 2.75rem; justify-content: flex-end; }
+.ao-lives .is-lost { color: var(--ao-grid); }
+.ao-lives .is-just-lost { animation: ao-heart-lost .5s ease; }
+
+@keyframes ao-heart-lost { 0% { transform: scale(1.4); } 100% { transform: scale(1); } }
+
+.ao-game-toolbar { justify-content: space-between; }
+.ao-game-timer { color: var(--ao-muted); font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; min-width: 4.5rem; text-align: center; }
+
+.ao-hint-count {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    min-width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 999px;
+    font-size: .65rem;
+    line-height: 1.1rem;
+    background: var(--ao-accent);
+    color: var(--ao-surface);
+    font-style: normal;
+}
+
+.ao-board-wrap { display: flex; justify-content: center; }
+
+.ao-board {
+    position: relative;
+    width: 100%;
+    /* Big enough for 16x16 boards: full width, but no taller than what fits under the header and toolbar. */
+    max-width: min(920px, calc(100vh - 13rem));
+    max-width: min(920px, calc(100dvh - 13rem));
+    aspect-ratio: 1 / 1;
+    background: var(--ao-surface);
+    border-radius: calc(var(--ao-radius) + 6px);
+    box-shadow: var(--ao-shadow);
+    padding: 2%;
+    touch-action: manipulation;
+}
+
+.ao-board svg { width: 100%; height: 100%; display: block; overflow: hidden; }
+
+/* Challenge boards: a big window you can pan around that fills the screen height (a tall
+   slice on phones) instead of a small square. */
+.ao-game-challenge { max-width: 1200px; }
+.ao-game-challenge .ao-board-wrap { min-width: 0; }
+.ao-game-challenge .ao-board {
+    aspect-ratio: auto;
+    max-width: 100%;
+    min-width: 0; /* without this the SVG's own width pushes the board wider than a phone screen */
+    overflow: hidden;
+    height: max(320px, calc(100vh - 14rem));
+    height: max(320px, calc(100dvh - 14rem));
+    padding: .5rem;
+}
+
+/* Thin lines like a printed maze. The dot grid is optional (# button). */
+.ao-game-challenge .ao-arrow .ao-arrow-body { stroke-width: 9; }
+.ao-game-challenge .ao-board:not(.show-grid) .ao-grid-lines { display: none; }
+#gridButton[aria-pressed="true"] { color: var(--ao-accent); }
+
+/* The SVG handles every gesture (pinch, drag) so the page doesn't scroll or zoom instead. */
+.ao-game-challenge .ao-board svg { touch-action: none; }
+.ao-game-challenge .ao-board svg.is-zoomed { cursor: grab; }
+.ao-game-challenge .ao-board svg.is-panning,
+.ao-game-challenge .ao-board svg.is-panning .ao-arrow { cursor: grabbing; }
+
+.ao-board.is-shaking { animation: ao-shake .35s ease; }
+
+@keyframes ao-shake {
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+.ao-board-loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--ao-muted); }
+
+/* Graph-paper lines: always 1 screen pixel thick, however far you zoom. */
+.ao-grid-lines { fill: none; stroke: var(--ao-grid); stroke-width: 1.25px; vector-effect: non-scaling-stroke; pointer-events: none; }
+
+.ao-arrow { cursor: pointer; outline: none; }
+.ao-arrow .ao-arrow-body { stroke: var(--ao-arrow); stroke-width: 11; stroke-linecap: round; stroke-linejoin: round; fill: none; transition: stroke .15s ease; }
+.ao-arrow .ao-arrow-head { fill: var(--ao-arrow); transition: fill .15s ease; }
+.ao-arrow .ao-arrow-hit { fill: transparent; }
+/* The second pencil stroke only shows up with the cartoon look (cartoon.css). */
+.ao-arrow .ao-arrow-sketch { display: none; fill: none; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+
+@media (hover: hover) {
+    .ao-arrow:hover .ao-arrow-body { stroke: var(--ao-accent); }
+    .ao-arrow:hover .ao-arrow-head { fill: var(--ao-accent); }
+}
+
+.ao-arrow:focus-visible .ao-arrow-body { stroke: var(--ao-accent); }
+.ao-arrow:focus-visible .ao-arrow-head { fill: var(--ao-accent); }
+
+.ao-arrow.is-blocked .ao-arrow-body,
+.ao-arrow.is-blocker .ao-arrow-body { stroke: var(--ao-danger); }
+.ao-arrow.is-blocked .ao-arrow-head,
+.ao-arrow.is-blocker .ao-arrow-head { fill: var(--ao-danger); }
+
+.ao-arrow.is-hint .ao-arrow-body { stroke: var(--ao-success); }
+.ao-arrow.is-hint .ao-arrow-head { fill: var(--ao-success); }
+.ao-arrow.is-hint { animation: ao-hint-pulse 1s ease-in-out infinite; }
+
+@keyframes ao-hint-pulse { 50% { opacity: .45; } }
+
+.ao-arrow.is-leaving { pointer-events: none; animation: ao-fade-late .9s ease forwards; }
+@keyframes ao-fade-late { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Editor */
+.ao-board-editor { max-width: 560px; margin: 0 auto; }
+.ao-cell { fill: transparent; cursor: crosshair; }
+.ao-cell:hover { fill: color-mix(in srgb, var(--ao-accent) 12%, transparent); }
+.ao-board-editor .ao-arrow { cursor: not-allowed; }
+.ao-board-editor .ao-arrow.is-stuck .ao-arrow-body { stroke: var(--ao-danger); }
+.ao-board-editor .ao-arrow.is-stuck .ao-arrow-head { fill: var(--ao-danger); }
+
+/* Modals */
+.ao-modal { background: var(--ao-surface); color: var(--ao-text); border: 0; border-radius: calc(var(--ao-radius) + 6px); }
+.ao-win-burst { font-size: 3rem; color: var(--ao-success); animation: ao-pop .5s cubic-bezier(.2, 1.6, .4, 1); }
+.ao-fail-icon { font-size: 3rem; color: var(--ao-danger); }
+.ao-confirm-icon { font-size: 2.4rem; color: var(--ao-accent); }
+#pickerModal .ao-kind-card { box-shadow: none; }
+.ao-modal-win { max-width: 380px; }
+.ao-modal-win .modal-footer .btn { white-space: nowrap; }
+
+.ao-win-time { display: flex; flex-direction: column; align-items: center; margin: .75rem 0 .25rem; }
+.ao-win-time-label { font-size: .8rem; color: var(--ao-muted); text-transform: uppercase; letter-spacing: .06em; }
+.ao-win-time-value { font-size: 2.6rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+
+.ao-win-points { display: flex; flex-direction: column; align-items: center; gap: .1rem; margin: .25rem 0 .5rem; }
+.ao-win-points-value { font-size: 1.35rem; font-weight: 800; color: var(--ao-success); animation: ao-pop .45s cubic-bezier(.2, 1.6, .4, 1) both .35s; }
+.ao-win-points-note { font-size: .8rem; color: var(--ao-muted); }
+
+.ao-win-stars { font-size: 2rem; color: var(--ao-grid); display: flex; justify-content: center; gap: .4rem; }
+.ao-win-stars .is-earned { color: #f2b01e; animation: ao-pop .45s cubic-bezier(.2, 1.6, .4, 1) both; }
+.ao-win-stars .is-earned:nth-child(2) { animation-delay: .15s; }
+.ao-win-stars .is-earned:nth-child(3) { animation-delay: .3s; }
+
+@keyframes ao-pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.ao-board.is-cleared { animation: ao-cleared .6s ease; }
+@keyframes ao-cleared { 50% { transform: scale(1.03); box-shadow: 0 0 0 6px color-mix(in srgb, var(--ao-success) 35%, transparent); } }
+
+@media (max-width: 575.98px) {
+    .ao-board { padding: 2%; border-radius: var(--ao-radius); }
+    .ao-game { gap: .5rem; }
+}
+
+/* Editor: the arrow you're drawing right now */
+.ao-board-editor { touch-action: none; }
+.ao-draft { fill: none; stroke: var(--ao-accent); stroke-width: 11; stroke-linecap: round; stroke-linejoin: round; opacity: .55; pointer-events: none; }

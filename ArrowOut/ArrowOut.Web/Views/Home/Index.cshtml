@@ -1,0 +1,71 @@
+@model HomeViewModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/game.css" asp-append-version="true" />
+}
+
+<section class="ao-hero text-center py-4 py-md-5">
+    @* A small maze that solves itself (home-demo.js). The boards are made on the server, and Razor
+       encodes the JSON in the attribute so it can't break out of it. *@
+    <div class="ao-hero-demo mx-auto mb-4" id="heroDemo" aria-hidden="true" data-boards="@HomeDemo.Json"></div>
+
+    <h1 class="display-5 fw-semibold mb-3">Pick a challenge. Find the way out.</h1>
+    <p class="lead text-muted mx-auto" style="max-width: 38rem">
+        Every challenge is a brand-new random labyrinth of long, twisting arrows — from 40 to 700 of them.
+        Tap an arrow and it slides out along its path. Hit another arrow and you lose a heart.
+    </p>
+
+    @if (Model.Summary is { } summary)
+    {
+        <div class="mt-4">
+            <partial name="_ChallengeKindPicker" />
+        </div>
+
+        @if (summary.UnfinishedId is { } unfinished)
+        {
+            <a class="btn btn-outline-ao mt-3" asp-controller="Challenge" asp-action="Play" asp-route-id="@unfinished">
+                <i class="bi bi-play-fill me-1"></i>Continue challenge #@unfinished
+            </a>
+        }
+    }
+    else
+    {
+        <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+            <a class="btn btn-lg btn-ao" asp-area="Identity" asp-page="/Account/Register"><i class="bi bi-play-fill me-1"></i>Play for free</a>
+            <a class="btn btn-lg btn-outline-ao" asp-area="Identity" asp-page="/Account/Login">I have an account</a>
+        </div>
+    }
+
+    @if (Model.Summary is { Played: > 0 } stats)
+    {
+        <div class="ao-progress-card mx-auto mt-5">
+            <div class="d-flex justify-content-around small text-muted">
+                <span><strong class="text-body">@stats.Played</strong> played</span>
+                <span><strong class="text-body">@stats.Won</strong> won</span>
+                <span><i class="bi bi-trophy text-warning"></i> <strong class="text-body">@stats.TotalPoints.ToString("N0")</strong> points</span>
+                <span><i class="bi bi-star-fill text-warning"></i> <strong class="text-body">@stats.TotalStars</strong> stars</span>
+            </div>
+        </div>
+    }
+</section>
+
+<section class="row row-cols-1 row-cols-md-3 g-3 mt-2">
+    <div class="col">
+        <div class="ao-feature h-100"><i class="bi bi-lightbulb"></i><h2 class="h5">Pure logic</h2><p>Every board is guaranteed solvable. Work out the order and clear it.</p></div>
+    </div>
+    <div class="col">
+        <div class="ao-feature h-100"><i class="bi bi-heart"></i><h2 class="h5">Three hearts</h2><p>A collision costs a heart. Lose them all and the board resets — same labyrinth, fresh start.</p></div>
+    </div>
+    <div class="col">
+        <div class="ao-feature h-100"><i class="bi bi-magic"></i><h2 class="h5">Hints when stuck</h2><p>Ask for a hint and the game highlights a safe arrow to tap next.</p></div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/game/engine.js" asp-append-version="true"></script>
+    <script src="~/js/game/board-renderer.js" asp-append-version="true"></script>
+    <script src="~/js/home-demo.js" asp-append-version="true"></script>
+}

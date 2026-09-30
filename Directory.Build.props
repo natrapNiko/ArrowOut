@@ -1,0 +1,19 @@
+<Project>
+  <!--
+    Shared build settings for every project in the solution.
+    To retarget (for example to net8.0 for Visual Studio 2022), change TargetFramework here
+    and the package versions in Directory.Packages.props.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Company>ArrowOut</Company>
+    <Product>ArrowOut</Product>
+  </PropertyGroup>
+</Project>

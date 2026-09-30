@@ -1,0 +1,65 @@
+@model ThemesIndexViewModel
+@{
+    ViewData["Title"] = "Themes";
+}
+
+<h1 class="h3 mb-1">Themes</h1>
+<p class="text-muted">Themes are JSON files in file storage (<code>App_Data/storage/themes</code>). Players pick one in their settings.</p>
+
+<div class="ao-card p-3 mb-4">
+    <form asp-action="Upload" method="post" enctype="multipart/form-data" class="row g-2 align-items-end">
+        <div class="col-12 col-md-8">
+            <label for="themeFile" class="form-label small text-muted">Upload a theme (.json, max 8 KB)</label>
+            <input id="themeFile" type="file" name="file" accept=".json,application/json" class="form-control" required />
+        </div>
+        <div class="col-12 col-md-4 d-grid">
+            <button class="btn btn-ao" type="submit"><i class="bi bi-upload me-1"></i>Upload</button>
+        </div>
+    </form>
+    <details class="mt-3 small">
+        <summary>File format</summary>
+<pre class="mt-2 mb-0"><code>{
+  "key": "ocean",
+  "name": "Ocean",
+  "isDark": false,
+  "colors": {
+    "background": "#eef5fb", "surface": "#ffffff", "grid": "#bcd3e6",
+    "text": "#12324a", "muted": "#5b7a91", "arrow": "#12324a",
+    "accent": "#1f7ae0", "danger": "#d64545", "success": "#2e9d5b"
+  }
+}</code></pre>
+    </details>
+</div>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+    @foreach (var theme in Model.Themes)
+    {
+        <div class="col">
+            <div class="ao-card p-3 h-100">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div>
+                        <div class="fw-semibold">@theme.Name</div>
+                        <code class="small">@theme.Key</code>
+                    </div>
+                    @if (Model.IsBuiltIn(theme.Key))
+                    {
+                        <span class="badge text-bg-light">Built-in</span>
+                    }
+                    else
+                    {
+                        <form asp-action="Delete" asp-route-key="@theme.Key" method="post">
+                            <button type="submit" class="btn btn-sm btn-icon text-danger" aria-label="Delete @theme.Name"><i class="bi bi-trash"></i></button>
+                        </form>
+                    }
+                </div>
+                <div class="ao-theme-swatch ao-theme-swatch-lg" style="background:@theme.Colors.Background; border-color:@theme.Colors.Grid">
+                    <span style="background:@theme.Colors.Text"></span>
+                    <span style="background:@theme.Colors.Arrow"></span>
+                    <span style="background:@theme.Colors.Accent"></span>
+                    <span style="background:@theme.Colors.Danger"></span>
+                    <span style="background:@theme.Colors.Success"></span>
+                </div>
+            </div>
+        </div>
+    }
+</div>

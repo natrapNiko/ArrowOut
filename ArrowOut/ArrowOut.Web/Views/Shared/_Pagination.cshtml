@@ -1,0 +1,40 @@
+@model PaginationViewModel
+@* Pager used by every list. Keeps the current filters in each link. *@
+@if (Model.Page.TotalPages > 1)
+{
+    <nav aria-label="Pagination" class="d-flex justify-content-center mt-4">
+        <ul class="pagination pagination-ao flex-wrap">
+            <li class="page-item @(Model.Page.HasPrevious ? "" : "disabled")">
+                <a class="page-link" asp-action="@Model.Action" asp-all-route-data="Model.RouteFor(Model.Page.Page - 1)" aria-label="Previous page">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+
+            @if (Model.VisiblePages().First() > 1)
+            {
+                <li class="page-item"><a class="page-link" asp-action="@Model.Action" asp-all-route-data="Model.RouteFor(1)">1</a></li>
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            }
+
+            @foreach (var number in Model.VisiblePages())
+            {
+                <li class="page-item @(number == Model.Page.Page ? "active" : "")" aria-current="@(number == Model.Page.Page ? "page" : null)">
+                    <a class="page-link" asp-action="@Model.Action" asp-all-route-data="Model.RouteFor(number)">@number</a>
+                </li>
+            }
+
+            @if (Model.VisiblePages().Last() < Model.Page.TotalPages)
+            {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+                <li class="page-item"><a class="page-link" asp-action="@Model.Action" asp-all-route-data="Model.RouteFor(Model.Page.TotalPages)">@Model.Page.TotalPages</a></li>
+            }
+
+            <li class="page-item @(Model.Page.HasNext ? "" : "disabled")">
+                <a class="page-link" asp-action="@Model.Action" asp-all-route-data="Model.RouteFor(Model.Page.Page + 1)" aria-label="Next page">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <p class="text-center text-muted small">Page @Model.Page.Page of @Model.Page.TotalPages · @Model.Page.TotalCount results</p>
+}

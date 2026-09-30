@@ -1,0 +1,20 @@
+@model DashboardStats
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1 class="h3 mb-4">Dashboard</h1>
+
+<div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3">
+    <div class="col"><div class="ao-stat"><div class="ao-stat-value">@Model.TotalLevels</div><div class="ao-stat-label">Levels</div></div></div>
+    <div class="col"><div class="ao-stat"><div class="ao-stat-value">@Model.PublishedLevels</div><div class="ao-stat-label">Published</div></div></div>
+    <div class="col"><div class="ao-stat"><div class="ao-stat-value">@Model.TotalUsers</div><div class="ao-stat-label">Players</div></div></div>
+    <div class="col"><div class="ao-stat"><div class="ao-stat-value">@Model.TotalAttempts</div><div class="ao-stat-label">Attempts</div></div></div>
+    <div class="col"><div class="ao-stat"><div class="ao-stat-value">@Model.TotalCompletions</div><div class="ao-stat-label">Completions</div></div></div>
+</div>
+
+<div class="d-flex flex-wrap gap-2 mt-4">
+    <a class="btn btn-ao" asp-controller="Levels" asp-action="Create"><i class="bi bi-plus-lg me-1"></i>New level</a>
+    <a class="btn btn-outline-ao" asp-controller="Users" asp-action="Index"><i class="bi bi-people me-1"></i>Manage users</a>
+    <a class="btn btn-outline-ao" asp-controller="Themes" asp-action="Index"><i class="bi bi-palette me-1"></i>Themes</a>
+</div>

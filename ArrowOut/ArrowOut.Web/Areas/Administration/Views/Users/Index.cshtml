@@ -1,0 +1,61 @@
+@model UsersIndexViewModel
+@{
+    ViewData["Title"] = "Users";
+}
+
+<h1 class="h3 mb-3">Users</h1>
+
+<form method="get" asp-action="Index" class="row g-2 align-items-end mb-3" role="search">
+    <div class="col-12 col-md-6">
+        <label for="search" class="form-label small text-muted">Search</label>
+        <input id="search" name="search" value="@Model.Query.Search" class="form-control" maxlength="100" placeholder="E-mail or display name" />
+    </div>
+    <div class="col-6 col-md-3">
+        <label asp-for="Query.Role" class="form-label small text-muted"></label>
+        <select asp-for="Query.Role" name="role" asp-items="Html.GetEnumSelectList<UserRoleFilter>()" class="form-select"></select>
+    </div>
+    <div class="col-6 col-md-3 d-grid">
+        <button class="btn btn-outline-ao" type="submit"><i class="bi bi-funnel me-1"></i>Apply</button>
+    </div>
+</form>
+
+<div class="table-responsive ao-card">
+    <table class="table table-hover align-middle mb-0 ao-table">
+        <thead>
+            <tr>
+                <th scope="col">User</th>
+                <th scope="col" class="d-none d-md-table-cell">Joined</th>
+                <th scope="col" class="text-end">Levels</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="text-end">Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Users.Items.Count == 0)
+            {
+                <tr><td colspan="5" class="text-center text-muted py-4">No users found.</td></tr>
+            }
+            @foreach (var user in Model.Users.Items)
+            {
+                <tr>
+                    <td>
+                        <div class="fw-medium">@user.PublicName @if (user.Id == Model.CurrentUserId) { <span class="badge text-bg-light">you</span> }</div>
+                        <div class="small text-muted">@user.Email</div>
+                    </td>
+                    <td class="d-none d-md-table-cell">@user.CreatedOn.ToString("yyyy-MM-dd")</td>
+                    <td class="text-end">@user.CompletedLevels</td>
+                    <td>
+                        @if (user.IsAdministrator) { <span class="badge text-bg-primary">Admin</span> }
+                        @if (user.IsLockedOut) { <span class="badge text-bg-danger">Locked</span> }
+                        @if (!user.IsAdministrator && !user.IsLockedOut) { <span class="badge text-bg-light">Player</span> }
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-icon" asp-action="Details" asp-route-id="@user.Id" aria-label="Manage @user.Email"><i class="bi bi-chevron-right"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<partial name="_Pagination" model="Model.Pagination" />

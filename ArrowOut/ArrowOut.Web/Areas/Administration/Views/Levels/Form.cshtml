@@ -1,0 +1,42 @@
+@model LevelFormViewModel
+@{
+    ViewData["Title"] = Model.IsEdit ? $"Edit level {Model.Input.Number}" : "New level";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/game.css" asp-append-version="true" />
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+    <div class="d-flex gap-2">
+        @if (Model.IsEdit)
+        {
+            <a class="btn btn-sm btn-outline-ao" asp-area="" asp-controller="Play" asp-action="Index" asp-route-number="@Model.Input.Number"><i class="bi bi-play me-1"></i>Play test</a>
+            <a class="btn btn-sm btn-outline-ao" asp-action="Export" asp-route-id="@Model.Id"><i class="bi bi-download me-1"></i>Export</a>
+        }
+        <a class="btn btn-sm btn-outline-secondary" asp-action="Index">Back to list</a>
+    </div>
+</div>
+
+<form asp-action="@(Model.IsEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post" id="levelForm" novalidate>
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <input type="hidden" asp-for="Input.Id" />
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-4">
+            <partial name="_LevelFields" model="Model" />
+        </div>
+
+        <div class="col-12 col-xl-8">
+            <partial name="_LevelEditor" model="Model" />
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/game/engine.js" asp-append-version="true"></script>
+    <script src="~/js/game/board-renderer.js" asp-append-version="true"></script>
+    <script src="~/js/admin/level-editor.js" asp-append-version="true"></script>
+}

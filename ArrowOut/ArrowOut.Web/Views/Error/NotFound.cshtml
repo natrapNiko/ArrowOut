@@ -1,0 +1,8 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Not found";
+}
+<div class="ao-error-illustration mx-auto mb-2" aria-hidden="true">
+    <svg viewBox="0 0 180 60"><g class="ao-demo-arrow"><line x1="10" y1="30" x2="140" y2="30" /><polygon points="165,30 140,14 140,46" /></g></svg>
+</div>
+<partial name="_ErrorBody" model="Model" />

@@ -1,0 +1,11 @@
+@model Difficulty
+@{
+    var css = Model switch
+    {
+        Difficulty.Easy => "ao-badge-easy",
+        Difficulty.Medium => "ao-badge-medium",
+        Difficulty.Hard => "ao-badge-hard",
+        _ => "ao-badge-expert",
+    };
+}
+<span class="badge ao-badge @css">@Model</span>

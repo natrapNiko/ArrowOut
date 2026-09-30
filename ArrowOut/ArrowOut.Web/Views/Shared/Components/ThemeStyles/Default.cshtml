@@ -1,0 +1,17 @@
+@model ArrowOut.Web.Infrastructure.ResolvedTheme
+@* Every colour was checked against ^#[0-9a-fA-F]{6}$ when the theme was saved, so nobody can sneak CSS in here.
+   Both colour sets are sent so the dark/light button switches instantly. <html data-mode> picks one, and without a choice the device setting decides. *@
+@functions {
+    private static string Vars(ArrowOut.Services.Themes.ThemeDefinition theme) =>
+        $"--ao-bg: {theme.Colors.Background}; --ao-surface: {theme.Colors.Surface}; --ao-grid: {theme.Colors.Grid}; " +
+        $"--ao-text: {theme.Colors.Text}; --ao-muted: {theme.Colors.Muted}; --ao-arrow: {theme.Colors.Arrow}; " +
+        $"--ao-accent: {theme.Colors.Accent}; --ao-danger: {theme.Colors.Danger}; --ao-success: {theme.Colors.Success}; " +
+        $"color-scheme: {(theme.IsDark ? "dark" : "light")};";
+}
+<style>
+    :root, :root[data-mode="light"] { @Html.Raw(Vars(Model.Light)) }
+    :root[data-mode="dark"] { @Html.Raw(Vars(Model.Dark)) --ao-shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 4px 18px rgb(0 0 0 / 35%); }
+    @@media (prefers-color-scheme: dark) {
+        :root:not([data-mode]) { @Html.Raw(Vars(Model.Dark)) --ao-shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 4px 18px rgb(0 0 0 / 35%); }
+    }
+</style>

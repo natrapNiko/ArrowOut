@@ -1,0 +1,46 @@
+@model SettingsViewModel
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<div class="mx-auto" style="max-width: 40rem">
+    <h1 class="h2 mb-4">Settings</h1>
+
+    <form asp-action="Index" method="post" class="ao-card p-4" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="mb-4">
+            <label asp-for="Input.DisplayName" class="form-label"></label>
+            <input asp-for="Input.DisplayName" class="form-control" maxlength="@DataConstants.User.DisplayNameMaxLength" placeholder="Shown on the leaderboard" />
+            <span asp-validation-for="Input.DisplayName" class="text-danger small"></span>
+        </div>
+
+        <fieldset class="mb-4">
+            <legend class="form-label fs-6">Theme</legend>
+            <div class="row row-cols-2 row-cols-sm-3 g-2">
+                @foreach (var theme in Model.Themes)
+                {
+                    var id = $"theme-{theme.Key}";
+                    <div class="col">
+                        <input type="radio" class="btn-check" asp-for="Input.ThemeKey" value="@theme.Key" id="@id" />
+                        <label class="ao-theme-option w-100" for="@id">
+                            <span class="ao-theme-swatch" style="background:@theme.Colors.Background; border-color:@theme.Colors.Grid">
+                                <span style="background:@theme.Colors.Arrow"></span>
+                                <span style="background:@theme.Colors.Accent"></span>
+                                <span style="background:@theme.Colors.Danger"></span>
+                            </span>
+                            <span class="small">@theme.Name</span>
+                        </label>
+                    </div>
+                }
+            </div>
+            <span asp-validation-for="Input.ThemeKey" class="text-danger small"></span>
+        </fieldset>
+
+        <button type="submit" class="btn btn-ao"><i class="bi bi-check2 me-1"></i>Save</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

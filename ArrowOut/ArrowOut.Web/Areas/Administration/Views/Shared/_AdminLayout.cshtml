@@ -1,0 +1,29 @@
+@* Layout inside the main layout: adds the side menu for admin pages and passes the sections through. *@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    string Active(string name) => string.Equals(controller, name, StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+}
+
+<div class="row g-4">
+    <aside class="col-12 col-lg-2">
+        <nav class="ao-admin-nav nav nav-pills flex-lg-column gap-1" aria-label="Administration">
+            <a class="nav-link @Active("Dashboard")" asp-area="Administration" asp-controller="Dashboard" asp-action="Index"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+            <a class="nav-link @Active("Levels")" asp-area="Administration" asp-controller="Levels" asp-action="Index"><i class="bi bi-grid-3x3 me-2"></i>Levels</a>
+            <a class="nav-link @Active("Users")" asp-area="Administration" asp-controller="Users" asp-action="Index"><i class="bi bi-people me-2"></i>Users</a>
+            <a class="nav-link @Active("Themes")" asp-area="Administration" asp-controller="Themes" asp-action="Index"><i class="bi bi-palette me-2"></i>Themes</a>
+        </nav>
+    </aside>
+    <section class="col-12 col-lg-10">
+        @RenderBody()
+    </section>
+</div>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

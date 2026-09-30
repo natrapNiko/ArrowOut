@@ -1,0 +1,56 @@
+@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<div class="ao-auth">
+    <partial name="_AuthAside" model='new AuthAsideModel("Welcome back.", "Your next labyrinth is waiting. Find the one arrow that can leave — then the next, and the next.")' />
+
+    <section class="ao-auth-main">
+        <a class="ao-auth-mobile-brand d-md-none" asp-area="" asp-controller="Home" asp-action="Index">
+            <span class="ao-brand-mark" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span>
+            ArrowOut
+        </a>
+
+        <h1 class="ao-auth-title">Sign in</h1>
+        <p class="ao-auth-subtitle">
+            New to ArrowOut?
+            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Create an account</a>
+        </p>
+
+        <form id="account" method="post" asp-route-returnUrl="@Model.ReturnUrl" novalidate>
+            <div asp-validation-summary="ModelOnly" class="ao-auth-alert" role="alert"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" type="email" autocomplete="username" autofocus aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Email"></label>
+                <span asp-validation-for="Input.Email" class="ao-field-error"></span>
+            </div>
+
+            <div class="form-floating mb-3 ao-password">
+                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Password" />
+                <label asp-for="Input.Password"></label>
+                <button type="button" class="ao-password-toggle" data-password-toggle aria-label="Show password"><i class="bi bi-eye"></i></button>
+                <span asp-validation-for="Input.Password" class="ao-field-error"></span>
+            </div>
+
+            <div class="form-check form-switch mb-4">
+                <input asp-for="Input.RememberMe" class="form-check-input" role="switch" />
+                <label asp-for="Input.RememberMe" class="form-check-label"></label>
+            </div>
+
+            <button id="login-submit" type="submit" class="btn btn-ao btn-lg w-100 ao-auth-submit">
+                Sign in <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+            </button>
+        </form>
+
+        <p class="ao-auth-footnote">
+            Just looking? <a asp-area="" asp-controller="Home" asp-action="HowToPlay">See how to play</a>
+        </p>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

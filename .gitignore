@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+TestResults/
+coverage*/
+ArrowOut/ArrowOut.Web/App_Data/storage/
+ArrowOut/ArrowOut.Web/appsettings.*.local.json

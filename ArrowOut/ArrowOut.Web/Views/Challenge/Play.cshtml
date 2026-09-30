@@ -1,0 +1,74 @@
+@model ChallengeViewModel
+@{
+    var challenge = Model.Challenge;
+    ViewData["Title"] = $"Challenge #{challenge.Id}";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/game.css" asp-append-version="true" />
+}
+
+@* Everything the script needs goes in data-* attributes (Razor encodes them), never in an inline script, so the CSP is happy. *@
+<div id="game" class="ao-game ao-game-challenge"
+     data-level-id="@challenge.Id"
+     data-max-lives="@challenge.MaxLives"
+     data-api-base="@Url.Content("~/api/challenges")">
+
+    <div class="ao-game-header">
+        <a class="btn btn-icon" asp-controller="Home" asp-action="Index" aria-label="Back to home"><i class="bi bi-house"></i></a>
+        <div class="ao-game-title">
+            <div class="ao-game-level">Challenge #@challenge.Id <span class="ao-kind-badge @Model.Kind.CssClass">@Model.Kind.Name</span></div>
+            <div class="ao-game-name text-truncate">Clear every arrow to win</div>
+        </div>
+        <div class="ao-lives" id="lives" aria-live="polite" aria-label="@challenge.MaxLives lives remaining">
+            @for (var i = 0; i < challenge.MaxLives; i++)
+            {
+                <i class="bi bi-heart-fill" aria-hidden="true"></i>
+            }
+        </div>
+    </div>
+
+    <div class="ao-board-wrap">
+        <div id="board" class="ao-board" aria-label="Puzzle board" role="group">
+            <div class="ao-board-loading"><div class="spinner-border" role="status"><span class="visually-hidden">Loading…</span></div></div>
+        </div>
+    </div>
+
+    <div class="ao-game-toolbar">
+        <div class="d-flex gap-1">
+            <button type="button" class="btn btn-icon" id="restartButton" aria-label="Restart (R)" title="Restart (R)"><i class="bi bi-arrow-counterclockwise"></i></button>
+            <button type="button" class="btn btn-icon position-relative" id="hintButton" aria-label="Hint (H)" title="Hint (H)">
+                <i class="bi bi-lightbulb"></i>
+                <span class="ao-hint-count" id="hintCount">3</span>
+            </button>
+        </div>
+        @* Only the time. We don't show how many arrows are left while you play, on purpose. *@
+        <div class="ao-game-timer" role="timer" aria-label="Time"><i class="bi bi-stopwatch" aria-hidden="true"></i> <span id="timer">0:00</span></div>
+        <div class="d-flex gap-1" role="group" aria-label="Zoom">
+            <button type="button" class="btn btn-icon" id="gridButton" aria-pressed="false" aria-label="Show grid (G)" title="Grid (G)"><i class="bi bi-hash"></i></button>
+            <button type="button" class="btn btn-icon" id="zoomOutButton" aria-label="Zoom out (-)" title="Zoom out (-)"><i class="bi bi-zoom-out"></i></button>
+            <button type="button" class="btn btn-icon" id="zoomFitButton" aria-label="Show whole board (0)" title="Whole board (0)"><i class="bi bi-fullscreen"></i></button>
+            <button type="button" class="btn btn-icon" id="zoomInButton" aria-label="Zoom in (+)" title="Zoom in (+)"><i class="bi bi-zoom-in"></i></button>
+        </div>
+    </div>
+
+    <div class="ao-game-footer small text-muted">
+        <span><i class="bi bi-mouse me-1"></i>Scroll or pinch to zoom · drag to move</span>
+        @if (challenge.IsCompleted)
+        {
+            <span class="ms-auto">Best: <partial name="_Stars" model="challenge.Stars" /></span>
+        }
+    </div>
+</div>
+
+<partial name="_ChallengeModals" model="challenge" />
+
+@* Anti-forgery token for the fetch() POSTs. game.js reads it and sends it as the X-CSRF-TOKEN header. *@
+<form id="antiforgery" class="d-none">@Html.AntiForgeryToken()</form>
+
+@section Scripts {
+    <script src="~/js/game/engine.js" asp-append-version="true"></script>
+    <script src="~/js/game/board-renderer.js" asp-append-version="true"></script>
+    <script src="~/js/game/board-viewport.js" asp-append-version="true"></script>
+    <script src="~/js/game/game.js" asp-append-version="true"></script>
+}

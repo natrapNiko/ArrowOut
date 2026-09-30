@@ -1,0 +1,36 @@
+@model LevelFormViewModel
+<div class="ao-card p-3" id="levelEditor"
+     data-generate-url="@Url.Action("Generate", "Levels", new { area = "Administration" })">
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-3 ao-editor-toolbar">
+        <div class="btn-group" role="group" aria-label="Arrow direction">
+            <button type="button" class="btn btn-outline-ao active" data-direction="Up" aria-label="Up" aria-pressed="true"><i class="bi bi-arrow-up"></i></button>
+            <button type="button" class="btn btn-outline-ao" data-direction="Right" aria-label="Right" aria-pressed="false"><i class="bi bi-arrow-right"></i></button>
+            <button type="button" class="btn btn-outline-ao" data-direction="Down" aria-label="Down" aria-pressed="false"><i class="bi bi-arrow-down"></i></button>
+            <button type="button" class="btn btn-outline-ao" data-direction="Left" aria-label="Left" aria-pressed="false"><i class="bi bi-arrow-left"></i></button>
+        </div>
+        <div class="input-group input-group-sm" style="width: 8.5rem">
+            <label class="input-group-text" for="editorLength">Length</label>
+            <input type="number" class="form-control" id="editorLength" min="@DataConstants.Arrow.LengthMin" max="@DataConstants.Arrow.LengthMax" value="2" />
+        </div>
+        <div class="ms-auto d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="editorClear"><i class="bi bi-eraser me-1"></i>Clear</button>
+            <button type="button" class="btn btn-sm btn-outline-ao" id="editorGenerate"><i class="bi bi-shuffle me-1"></i>Generate</button>
+        </div>
+    </div>
+
+    <p class="small text-muted mb-2">
+        <strong>Drag</strong> across empty cells to draw a winding arrow — the cell where you release is the head.
+        <strong>Click</strong> an empty cell for a straight arrow (toolbar direction and length). Click an arrow to remove it.
+        Aim for a fully filled, solvable board.
+    </p>
+
+    <div id="editorBoard" class="ao-board ao-board-editor" aria-label="Level editor board"></div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 small" aria-live="polite">
+        <span id="editorStatus" class="fw-semibold"></span>
+        <span id="editorStats" class="text-muted"></span>
+    </div>
+
+    <textarea asp-for="Input.ArrowsJson" class="d-none" id="arrowsJson"></textarea>
+    <span asp-validation-for="Input.ArrowsJson" class="text-danger small d-block mt-2"></span>
+</div>

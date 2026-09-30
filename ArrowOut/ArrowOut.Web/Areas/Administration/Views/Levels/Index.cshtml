@@ -1,0 +1,93 @@
+@model AdminLevelsIndexViewModel
+@{
+    ViewData["Title"] = "Manage levels";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0">Levels</h1>
+    <div class="d-flex flex-wrap gap-2">
+        <form asp-action="Import" method="post" enctype="multipart/form-data" class="d-flex gap-2">
+            <label class="visually-hidden" for="importFile">Level JSON file</label>
+            <input id="importFile" type="file" name="file" accept=".json,application/json" class="form-control form-control-sm" required />
+            <button class="btn btn-sm btn-outline-ao text-nowrap" type="submit"><i class="bi bi-upload me-1"></i>Import</button>
+        </form>
+        <a class="btn btn-sm btn-ao" asp-action="Create"><i class="bi bi-plus-lg me-1"></i>New level</a>
+    </div>
+</div>
+
+<form method="get" asp-action="Index" class="row g-2 align-items-end mb-3" role="search">
+    <div class="col-12 col-md-4">
+        <label asp-for="Query.Search" class="form-label small text-muted">Search</label>
+        <input asp-for="Query.Search" name="search" class="form-control" placeholder="Name or number" />
+    </div>
+    <div class="col-6 col-md-2">
+        <label asp-for="Query.Difficulty" class="form-label small text-muted"></label>
+        <select asp-for="Query.Difficulty" name="difficulty" asp-items="Html.GetEnumSelectList<Difficulty>()" class="form-select">
+            <option value="">Any</option>
+        </select>
+    </div>
+    <div class="col-6 col-md-2">
+        <label asp-for="Query.IsPublished" class="form-label small text-muted">State</label>
+        <select asp-for="Query.IsPublished" name="isPublished" class="form-select">
+            <option value="">Any</option>
+            <option value="true">Published</option>
+            <option value="false">Draft</option>
+        </select>
+    </div>
+    <div class="col-6 col-md-2">
+        <label asp-for="Query.Sort" class="form-label small text-muted"></label>
+        <select asp-for="Query.Sort" name="sort" asp-items="Html.GetEnumSelectList<AdminLevelSort>()" class="form-select"></select>
+    </div>
+    <div class="col-6 col-md-2 d-grid">
+        <button class="btn btn-outline-ao" type="submit"><i class="bi bi-funnel me-1"></i>Apply</button>
+    </div>
+</form>
+
+<div class="table-responsive ao-card">
+    <table class="table table-hover align-middle mb-0 ao-table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Difficulty</th>
+                <th scope="col" class="d-none d-md-table-cell">Board</th>
+                <th scope="col" class="d-none d-md-table-cell text-end">Cleared by</th>
+                <th scope="col">State</th>
+                <th scope="col" class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Levels.Items.Count == 0)
+            {
+                <tr><td colspan="7" class="text-center text-muted py-4">No levels found.</td></tr>
+            }
+            @foreach (var level in Model.Levels.Items)
+            {
+                <tr>
+                    <td class="fw-semibold">@level.Number</td>
+                    <td>@level.Name</td>
+                    <td><partial name="_DifficultyBadge" model="level.Difficulty" /></td>
+                    <td class="d-none d-md-table-cell">@level.Width×@level.Height · @level.ArrowCount arrows</td>
+                    <td class="d-none d-md-table-cell text-end">@level.CompletionCount</td>
+                    <td>
+                        <form asp-action="SetPublished" asp-route-id="@level.Id" method="post" class="d-inline">
+                            <input type="hidden" name="isPublished" value="@(level.IsPublished ? "false" : "true")" />
+                            <button type="submit" class="btn btn-sm @(level.IsPublished ? "btn-success" : "btn-outline-secondary")"
+                                    title="@(level.IsPublished ? "Unpublish" : "Publish")">
+                                @(level.IsPublished ? "Published" : "Draft")
+                            </button>
+                        </form>
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-icon" asp-area="" asp-controller="Play" asp-action="Index" asp-route-number="@level.Number" title="Play"><i class="bi bi-play"></i></a>
+                        <a class="btn btn-sm btn-icon" asp-action="Edit" asp-route-id="@level.Id" title="Edit"><i class="bi bi-pencil"></i></a>
+                        <a class="btn btn-sm btn-icon" asp-action="Export" asp-route-id="@level.Id" title="Export JSON"><i class="bi bi-download"></i></a>
+                        <a class="btn btn-sm btn-icon text-danger" asp-action="Delete" asp-route-id="@level.Id" title="Delete"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<partial name="_Pagination" model="Model.Pagination" />

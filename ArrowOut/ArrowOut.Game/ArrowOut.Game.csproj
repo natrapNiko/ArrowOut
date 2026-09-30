@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Pure, dependency-free puzzle engine. No I/O, no EF, no ASP.NET: trivially unit-testable. -->
+  <PropertyGroup>
+    <RootNamespace>ArrowOut.Game</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ArrowOut.Tests" />
+  </ItemGroup>
+
+</Project>

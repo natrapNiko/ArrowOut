@@ -1,0 +1,93 @@
+@inject IThemeResolver ThemeResolver
+@{
+    var theme = await ThemeResolver.ResolveAsync(Context);
+}
+<!DOCTYPE html>
+@* Razor keeps empty data-* attributes, but "no choice yet" has to mean no data-mode at all (then
+   the page follows the device setting), so we only write the attributes when a mode was picked.
+   Mode is always "light" or "dark", never something the user typed. *@
+<html lang="en"@Html.Raw(theme.Mode is { } mode ? $" data-mode=\"{mode}\" data-bs-theme=\"{mode}\"" : string.Empty)>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="@theme.Initial.Colors.Background" />
+    <meta name="description" content="ArrowOut — a calm logic puzzle. Slide every arrow off the board without a collision." />
+    <title>@(ViewData["Title"] is string title ? $"{title} · ArrowOut" : "ArrowOut")</title>
+    <link rel="icon" href="~/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @await Component.InvokeAsync("ThemeStyles")
+    @await RenderSectionAsync("Styles", required: false)
+    @* The cartoon look goes last so it also styles the page-specific CSS (game board, dialogs). *@
+    <link rel="stylesheet" href="~/css/cartoon.css" asp-append-version="true" />
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <a class="visually-hidden-focusable skip-link" href="#main">Skip to content</a>
+
+    <header>
+        <nav class="navbar navbar-expand-md ao-navbar">
+            <div class="container">
+                <a class="navbar-brand ao-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="ao-brand-mark" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span>
+                    ArrowOut
+                </a>
+                <div class="d-flex align-items-center gap-1 order-md-last ms-auto ms-md-2">
+                    @* Dark/light button: switches right away in the browser (site.js), the post just remembers it. *@
+                    <form method="post" asp-area="" asp-controller="ThemeMode" asp-action="Set" data-mode-toggle>
+                        <input type="hidden" name="mode" value="@(theme.Mode == ResolvedTheme.DarkMode ? ResolvedTheme.LightMode : ResolvedTheme.DarkMode)" />
+                        <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                        <button type="submit" class="btn btn-icon btn-sm ao-mode-toggle" aria-label="Switch between dark and light mode" title="Dark / light mode">
+                            <i class="bi bi-moon-stars ao-when-light" aria-hidden="true"></i>
+                            <i class="bi bi-sun ao-when-dark" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                            aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-play-circle me-1"></i>Play</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Leaderboard" asp-action="Index"><i class="bi bi-trophy me-1"></i>Leaderboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="HowToPlay"><i class="bi bi-question-circle me-1"></i>How to play</a>
+                        </li>
+                        @if (User.IsInRole(Roles.Administrator))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Administration" asp-controller="Dashboard" asp-action="Index"><i class="bi bi-sliders me-1"></i>Admin</a>
+                            </li>
+                        }
+                    </ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main" class="flex-grow-1 py-4" role="main">
+        <div class="container">
+            <partial name="_StatusMessages" />
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="ao-footer py-3 mt-auto">
+        <div class="container d-flex flex-wrap justify-content-between gap-2 small">
+            <span>&copy; @DateTime.UtcNow.Year ArrowOut — an original puzzle game inspired by the arrow-escape genre.</span>
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

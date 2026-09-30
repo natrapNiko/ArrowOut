@@ -1,0 +1,66 @@
+@model LevelFormViewModel
+@* The browser checks come from the DataAnnotations on LevelInputModel (unobtrusive validation).
+   The server checks the same attributes again, and the database has CHECK constraints on top. *@
+<div class="ao-card p-3">
+    <div class="mb-3">
+        <label asp-for="Input.Number" class="form-label"></label>
+        <input asp-for="Input.Number" class="form-control" />
+        <span asp-validation-for="Input.Number" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.Name" class="form-label"></label>
+        <input asp-for="Input.Name" class="form-control" maxlength="@DataConstants.Level.NameMaxLength" />
+        <span asp-validation-for="Input.Name" class="text-danger small"></span>
+    </div>
+    <div class="row g-2 mb-3">
+        <div class="col-6">
+            <label asp-for="Input.Width" class="form-label"></label>
+            <input asp-for="Input.Width" class="form-control" data-editor-width />
+            <span asp-validation-for="Input.Width" class="text-danger small"></span>
+        </div>
+        <div class="col-6">
+            <label asp-for="Input.Height" class="form-label"></label>
+            <input asp-for="Input.Height" class="form-control" data-editor-height />
+            <span asp-validation-for="Input.Height" class="text-danger small"></span>
+        </div>
+    </div>
+    <div class="row g-2 mb-3">
+        <div class="col-6">
+            <label asp-for="Input.MaxLives" class="form-label"></label>
+            <input asp-for="Input.MaxLives" class="form-control" />
+            <span asp-validation-for="Input.MaxLives" class="text-danger small"></span>
+        </div>
+        <div class="col-6">
+            <label asp-for="Input.Difficulty" class="form-label"></label>
+            <select asp-for="Input.Difficulty" asp-items="Html.GetEnumSelectList<Difficulty>()" class="form-select" data-editor-difficulty></select>
+            <span asp-validation-for="Input.Difficulty" class="text-danger small"></span>
+        </div>
+    </div>
+    <div class="form-check form-switch mb-3">
+        <input asp-for="Input.IsPublished" class="form-check-input" role="switch" />
+        <label asp-for="Input.IsPublished" class="form-check-label"></label>
+    </div>
+
+    @if (Model.Report is { } report)
+    {
+        <div class="ao-report small mb-3">
+            <div><strong>Server check:</strong>
+                @if (report.IsValid)
+                {
+                    <span class="text-success"><i class="bi bi-check-circle"></i> solvable</span>
+                }
+                else
+                {
+                    <span class="text-danger"><i class="bi bi-x-circle"></i> invalid</span>
+                }
+            </div>
+            <div>Arrows: @report.ArrowCount · Depth: @report.Depth · Suggested: @report.SuggestedDifficulty</div>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-ao w-100"><i class="bi bi-save me-1"></i>@(Model.IsEdit ? "Save changes" : "Create level")</button>
+    @if (Model.IsEdit)
+    {
+        <p class="small text-muted mt-2 mb-0">Changing the layout resets player progress for this level.</p>
+    }
+</div>

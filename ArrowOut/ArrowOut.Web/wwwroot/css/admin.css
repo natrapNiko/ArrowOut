@@ -1,0 +1,11 @@
+.ao-admin-nav .nav-link { color: var(--ao-text); border-radius: 10px; }
+.ao-admin-nav .nav-link.active { background: var(--ao-text); color: var(--ao-bg); }
+.ao-admin-nav .nav-link:not(.active):hover { background: color-mix(in srgb, var(--ao-grid) 35%, transparent); }
+
+.ao-stat { padding: 1rem 1.25rem; }
+.ao-stat-value { font-size: 1.8rem; font-weight: 700; line-height: 1.1; }
+.ao-stat-label { color: var(--ao-muted); font-size: .85rem; }
+
+.ao-editor-toolbar .btn.active { background: var(--ao-text); color: var(--ao-bg); border-color: var(--ao-text); }
+
+.ao-report { padding: .6rem .75rem; border-radius: 10px; background: color-mix(in srgb, var(--ao-grid) 25%, transparent); }

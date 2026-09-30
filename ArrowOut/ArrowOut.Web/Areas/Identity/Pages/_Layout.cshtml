@@ -1,0 +1,15 @@
+@* Replaces the stand-alone layout from the Identity UI package, so every account page (sign in,
+   sign up, manage account, lockout...) uses the normal site layout and the player's theme. *@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+@RenderBody()
+
+@section Styles {
+    @await RenderSectionAsync("Styles", required: false)
+}
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

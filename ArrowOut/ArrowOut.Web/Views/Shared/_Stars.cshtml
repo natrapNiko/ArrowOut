@@ -1,0 +1,7 @@
+@model int
+<span class="ao-stars" aria-label="@Model of 3 stars">
+    @for (var i = 1; i <= DataConstants.Progress.StarsMax; i++)
+    {
+        <i class="bi @(i <= Model ? "bi-star-fill is-earned" : "bi-star")" aria-hidden="true"></i>
+    }
+</span>

@@ -1,0 +1,93 @@
+@model ChallengeInfo
+<div class="modal fade" id="winModal" tabindex="-1" aria-labelledby="winTitle" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered ao-modal-win">
+        <div class="modal-content ao-modal text-center">
+            <div class="modal-body p-4">
+                <div class="ao-win-burst mb-2" aria-hidden="true"><i class="bi bi-check2-circle"></i></div>
+                <h2 class="h4" id="winTitle">Challenge cleared!</h2>
+
+                <div class="ao-win-time" aria-live="polite">
+                    <span class="ao-win-time-label"><i class="bi bi-stopwatch" aria-hidden="true"></i> Your time</span>
+                    <span class="ao-win-time-value" id="winTime">0:00</span>
+                </div>
+
+                <div class="ao-win-stars my-2" id="winStars" aria-live="polite"></div>
+
+                @* Filled in from the server's checked result. Hidden if the win couldn't be saved. *@
+                <div class="ao-win-points d-none" id="winPoints" aria-live="polite">
+                    <span class="ao-win-points-value" id="winPointsValue"></span>
+                    <span class="ao-win-points-note" id="winPointsNote"></span>
+                </div>
+                <p class="text-muted mb-1" id="winDetail"></p>
+                <p class="text-success small mb-0 d-none" id="winBest"><i class="bi bi-award me-1"></i>New personal best</p>
+                <p class="text-danger small mb-0 d-none" id="winError"></p>
+            </div>
+            <div class="modal-footer flex-column border-0 pt-0 pb-4 px-4 gap-2">
+                <form method="post" asp-controller="Challenge" asp-action="New" data-busy-text="Building…" class="w-100 m-0">
+                    <input type="hidden" name="kind" value="@Model.Kind" />
+                    <button type="submit" class="btn btn-ao btn-lg w-100"><i class="bi bi-shuffle me-1"></i>Start new challenge</button>
+                </form>
+                <div class="d-flex w-100 gap-2 m-0">
+                    <button type="button" class="btn btn-outline-ao flex-fill" id="replayButton"><i class="bi bi-arrow-counterclockwise me-1"></i>Replay</button>
+                    <button type="button" class="btn btn-outline-ao flex-fill" id="otherChallengesButton"><i class="bi bi-grid me-1"></i>Other challenges</button>
+                </div>
+                @* Goes straight to the tab you just played (e.g. Easy after an Easy win). *@
+                <a class="btn btn-outline-ao w-100 m-0 ao-win-leaderboard" id="leaderboardButton"
+                   asp-controller="Leaderboard" asp-action="Index" asp-route-kind="@Model.Kind" asp-route-from="@Model.Id">
+                    <i class="bi bi-trophy-fill me-1" aria-hidden="true"></i>@ChallengeKindOption.For(Model.Kind).Name leaderboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="failModal" tabindex="-1" aria-labelledby="failTitle" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content ao-modal text-center">
+            <div class="modal-body p-4">
+                <div class="ao-fail-icon mb-2" aria-hidden="true"><i class="bi bi-heartbreak"></i></div>
+                <h2 class="h4" id="failTitle">Out of hearts</h2>
+                <p class="text-muted mb-0">The arrows jammed this time. Try the same labyrinth again, or start a new one.</p>
+            </div>
+            <div class="modal-footer justify-content-center border-0 pt-0 pb-4">
+                <form method="post" asp-controller="Challenge" asp-action="New" data-busy-text="Building…">
+                    <input type="hidden" name="kind" value="@Model.Kind" />
+                    <button type="submit" class="btn btn-outline-ao"><i class="bi bi-shuffle me-1"></i>New challenge</button>
+                </form>
+                <button type="button" class="btn btn-ao" id="retryButton"><i class="bi bi-arrow-counterclockwise me-1"></i>Try again</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* "Other challenges": pick a new kind right here instead of going back to the home page. *@
+<div class="modal fade" id="pickerModal" tabindex="-1" aria-labelledby="pickerTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content ao-modal">
+            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                <h2 class="h4 mb-0" id="pickerTitle">Choose your next challenge</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <partial name="_ChallengeKindPicker" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Yes/No before throwing away progress (restart, replay). game.js fills in the text. *@
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmTitle" aria-describedby="confirmMessage" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content ao-modal text-center">
+            <div class="modal-body p-4">
+                <div class="ao-confirm-icon mb-2" aria-hidden="true"><i class="bi bi-arrow-counterclockwise"></i></div>
+                <h2 class="h5" id="confirmTitle">Are you sure?</h2>
+                <p class="text-muted mb-0" id="confirmMessage"></p>
+            </div>
+            <div class="modal-footer justify-content-center border-0 pt-0 pb-4 gap-2">
+                <button type="button" class="btn btn-outline-ao px-4" id="confirmNo">No</button>
+                <button type="button" class="btn btn-ao px-4" id="confirmYes">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
