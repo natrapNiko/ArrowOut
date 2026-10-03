@@ -80,6 +80,35 @@ If no admin exists yet and no password is set, the app writes a warning to the l
 an admin. The demo account only gets created when both `Seed:DemoEmail` and `Seed:DemoPassword` are set, which
 by default is only in Development.
 
+### Confirming e-mail addresses
+
+New players have to confirm their e-mail before they can sign in. After signing up they get an e-mail with
+a link, and clicking it activates the account and signs them in. The link works for 24 hours. If it got lost,
+there's a "Send it again" link on the "Check your inbox" page and on the sign-in page. The admin and demo
+accounts are created already confirmed.
+
+To actually send e-mails, the app needs an SMTP server. Any mail provider works. With Gmail:
+
+1. Turn on 2-Step Verification for your Google account.
+2. Go to <https://myaccount.google.com/apppasswords> and create an app password. You get 16 letters.
+   Your normal Gmail password won't work here.
+3. Save the settings in user secrets, so the password never ends up in the code:
+
+```bash
+cd ArrowOut/ArrowOut.Web
+dotnet user-secrets set "Email:SmtpHost" "smtp.gmail.com"
+dotnet user-secrets set "Email:SmtpPort" "587"
+dotnet user-secrets set "Email:UserName" "you@gmail.com"
+dotnet user-secrets set "Email:Password" "<the 16-letter app password>"
+dotnet user-secrets set "Email:FromAddress" "you@gmail.com"
+```
+
+Restart the app and sign up with a real address to try it. For Outlook use `smtp-mail.outlook.com`, port 587.
+
+Without these settings nothing is sent. The e-mail (including the link) is written to the console log
+instead, and in Development the "Check your inbox" page also shows the link, so you can test sign-up without
+a mailbox. On a real server you have to set up SMTP, otherwise nobody can finish signing up.
+
 ### Staying on .NET 8 or Visual Studio 2022
 
 VS 2022 only officially goes up to .NET 9. To run on .NET 8:
@@ -225,6 +254,9 @@ they keep a normal `Arrows` table.
 | `Analytics:ApiKey` | empty | Your PostHog project key |
 | `Analytics:Host` | `https://eu.i.posthog.com` | Which PostHog region to use |
 | `Analytics:QueueCapacity` | `1000` | How many events can wait in the queue |
+| `Email:SmtpHost` / `Email:SmtpPort` | empty / `587` | The mail server for confirmation e-mails |
+| `Email:UserName` / `Email:Password` | empty | Login for the mail server (keep these in user secrets) |
+| `Email:FromAddress` / `Email:FromName` | empty / `ArrowOut` | Who the e-mails come from |
 
 About analytics: when it's turned on, the game sends an event when a challenge is created and another when it's
 won (kind, number of arrows, mistakes, hints used, points). Events go into a small in-memory queue and are

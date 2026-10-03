@@ -1,0 +1,45 @@
+@page
+@model RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Check your inbox";
+}
+
+<div class="ao-auth">
+    <partial name="_AuthAside" model='new AuthAsideModel("Almost there.", "One click on the link in your e-mail and your first labyrinth is ready.")' />
+
+    <section class="ao-auth-main">
+        <h1 class="ao-auth-title">Check your inbox</h1>
+
+        @if (Model.SendFailed)
+        {
+            <div class="ao-auth-alert" role="alert">
+                Your account was created, but we couldn't send the e-mail right now. Try sending it again in a minute.
+            </div>
+        }
+        else
+        {
+            @* Razor encodes the address, so whatever was typed in the form is safe to show here. *@
+            <p class="ao-auth-subtitle">
+                We sent a confirmation link to <strong>@Model.Email</strong>. Click it to activate your account,
+                then you can sign in. If you don't see it, check your spam folder.
+            </p>
+        }
+
+        @if (Model.DevLink is not null)
+        {
+            <div class="ao-auth-devlink">
+                <strong>Development only:</strong> no SMTP server is set up, so no e-mail was sent.
+                Use this link instead:
+                <a href="@Model.DevLink">Confirm the e-mail</a>
+            </div>
+        }
+
+        <a class="btn btn-ao btn-lg w-100 ao-auth-submit" asp-page="./Login">
+            Go to sign in <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+        </a>
+
+        <p class="ao-auth-footnote">
+            No e-mail? <a asp-page="./ResendEmailConfirmation" asp-route-email="@Model.Email">Send it again</a>
+        </p>
+    </section>
+</div>

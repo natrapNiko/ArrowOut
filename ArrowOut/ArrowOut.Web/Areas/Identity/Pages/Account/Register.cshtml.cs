@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Net.Mail;
 using ArrowOut.Data.Common;
 using ArrowOut.Data.Models;
 using ArrowOut.Web.Infrastructure;
@@ -6,16 +7,21 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Options;
 
 namespace ArrowOut.Web.Areas.Identity.Pages.Account;
 
-// Our own sign-up page. There's no e-mail confirmation (RequireConfirmedAccount = false),
-// so new players are logged in right away.
+// Our own sign-up page. New players get an e-mail with a confirmation link and can only sign in
+// after clicking it (RequireConfirmedAccount = true in Program.cs).
 [AllowAnonymous]
 public class RegisterModel(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
     IThemeResolver themeResolver,
+    AccountEmails accountEmails,
+    IOptions<EmailOptions> emailOptions,
+    IWebHostEnvironment environment,
     ILogger<RegisterModel> logger) : PageModel
 {
     [BindProperty]
@@ -110,9 +116,31 @@ public class RegisterModel(
             return Page();
         }
 
-        logger.LogInformation("New player account created.");
-        await signInManager.SignInAsync(user, isPersistent: false);
-        return LocalRedirect(ReturnUrl);
+        logger.LogInformation("New player account created, waiting for e-mail confirmation.");
+        await SendConfirmationAsync(user, accountEmails, emailOptions.Value, environment, Url, Request.Scheme, TempData, logger);
+        return RedirectToPage("./RegisterConfirmation", new { email });
+    }
+
+    // Shared with the resend page. If sending fails the account still exists, so we just tell the
+    // player and they can ask for a new link. In Development without SMTP the link is shown on the
+    // next page, so you can test sign-up without a real mailbox.
+    internal static async Task SendConfirmationAsync(
+        ApplicationUser user, AccountEmails accountEmails, EmailOptions options, IWebHostEnvironment environment,
+        IUrlHelper url, string scheme, ITempDataDictionary tempData, ILogger logger)
+    {
+        try
+        {
+            var link = await accountEmails.SendConfirmationAsync(user, url, scheme);
+            if (environment.IsDevelopment() && !options.IsConfigured)
+            {
+                tempData[RegisterConfirmationModel.DevLinkKey] = link;
+            }
+        }
+        catch (Exception ex) when (ex is SmtpException or InvalidOperationException)
+        {
+            logger.LogError(ex, "Could not send the confirmation e-mail.");
+            tempData[RegisterConfirmationModel.SendFailedKey] = true;
+        }
     }
 
     private string SafeReturnUrl(string? returnUrl) =>

@@ -1,0 +1,32 @@
+@page
+@model ConfirmEmailModel
+@{
+    ViewData["Title"] = Model.Confirmed ? "E-mail confirmed" : "Link not valid";
+}
+
+<div class="ao-auth">
+    <partial name="_AuthAside" model='new AuthAsideModel("All set.", "Pick Easy, Medium or Hard and find the first arrow that can get out.")' />
+
+    <section class="ao-auth-main">
+        @if (Model.Confirmed)
+        {
+            <h1 class="ao-auth-title">E-mail confirmed</h1>
+            <p class="ao-auth-subtitle">Thanks! Your account is ready to go.</p>
+
+            <a class="btn btn-ao btn-lg w-100 ao-auth-submit" asp-area="" asp-controller="Home" asp-action="Index">
+                Start playing <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+            </a>
+        }
+        else
+        {
+            <h1 class="ao-auth-title">That link didn't work</h1>
+            <p class="ao-auth-subtitle">
+                It may be older than 24 hours, or it got cut off when you copied it. You can ask for a new one.
+            </p>
+
+            <a class="btn btn-ao btn-lg w-100 ao-auth-submit" asp-page="./ResendEmailConfirmation">
+                Send a new link <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+            </a>
+        }
+    </section>
+</div>

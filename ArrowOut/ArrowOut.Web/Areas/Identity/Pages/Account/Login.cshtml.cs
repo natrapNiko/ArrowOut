@@ -10,12 +10,18 @@ namespace ArrowOut.Web.Areas.Identity.Pages.Account;
 
 // Our own sign-in page instead of the default Identity one.
 [AllowAnonymous]
-public class LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger) : PageModel
+public class LoginModel(
+    SignInManager<ApplicationUser> signInManager,
+    UserManager<ApplicationUser> userManager,
+    ILogger<LoginModel> logger) : PageModel
 {
     [BindProperty]
     public InputModel Input { get; set; } = new();
 
     public string ReturnUrl { get; private set; } = "/";
+
+    // The password was right but the e-mail isn't confirmed yet, so show the "send it again" link.
+    public bool NeedsConfirmation { get; private set; }
 
     [TempData]
     public string? ErrorMessage { get; set; }
@@ -65,8 +71,8 @@ public class LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<Lo
         }
 
         // Wrong passwords count towards the lockout from Program.cs (5 tries, then 10 minutes).
-        var result = await signInManager.PasswordSignInAsync(
-            Input.Email.Trim(), Input.Password, Input.RememberMe, lockoutOnFailure: true);
+        var email = Input.Email.Trim();
+        var result = await signInManager.PasswordSignInAsync(email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
 
         if (result.Succeeded)
         {
@@ -83,6 +89,19 @@ public class LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<Lo
         {
             logger.LogWarning("User account locked out.");
             return RedirectToPage("./Lockout");
+        }
+
+        // Identity says "not allowed" before it even checks the password, so check it ourselves.
+        // Only someone who knows the password gets told the account is waiting for confirmation.
+        if (result.IsNotAllowed)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user is { EmailConfirmed: false } && await userManager.CheckPasswordAsync(user, Input.Password))
+            {
+                NeedsConfirmation = true;
+                ModelState.AddModelError(string.Empty, "Please confirm your e-mail first. We sent you a link when you signed up.");
+                return Page();
+            }
         }
 
         // Same message whether the user doesn't exist or the password is wrong, so nobody can check which e-mails have accounts.

@@ -506,6 +506,17 @@ body, .ao-navbar, .ao-card, .ao-feature, .ao-board, .dropdown-menu, .form-contro
     font-size: .92rem;
 }
 .ao-auth-alert ul { margin: 0; padding-left: 1.1rem; }
+.ao-auth-resend { margin: -.25rem 0 1rem; font-size: .92rem; }
+
+/* The confirmation link, shown only in Development when there's no SMTP server. */
+.ao-auth-devlink {
+    margin-bottom: 1.25rem;
+    padding: .75rem 1rem;
+    border: 2px dashed var(--ao-accent);
+    border-radius: 12px;
+    font-size: .9rem;
+    overflow-wrap: anywhere;
+}
 .ao-auth-alert.validation-summary-valid { display: none; }
 
 .ao-password-rules {

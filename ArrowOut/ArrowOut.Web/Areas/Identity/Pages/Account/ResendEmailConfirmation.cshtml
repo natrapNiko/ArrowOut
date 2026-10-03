@@ -1,0 +1,36 @@
+@page
+@model ResendEmailConfirmationModel
+@{
+    ViewData["Title"] = "Send the link again";
+}
+
+<div class="ao-auth">
+    <partial name="_AuthAside" model='new AuthAsideModel("Lost the e-mail?", "No problem. We can send you a fresh link.")' />
+
+    <section class="ao-auth-main">
+        <h1 class="ao-auth-title">Send the link again</h1>
+        <p class="ao-auth-subtitle">Enter the e-mail you signed up with and we'll send a new confirmation link.</p>
+
+        <form method="post" novalidate>
+            <div asp-validation-summary="ModelOnly" class="ao-auth-alert" role="alert"></div>
+
+            <div class="form-floating mb-4">
+                <input asp-for="Input.Email" class="form-control" type="email" autocomplete="email" autofocus aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Email"></label>
+                <span asp-validation-for="Input.Email" class="ao-field-error"></span>
+            </div>
+
+            <button type="submit" class="btn btn-ao btn-lg w-100 ao-auth-submit">
+                Send link <i class="bi bi-envelope ms-1" aria-hidden="true"></i>
+            </button>
+        </form>
+
+        <p class="ao-auth-footnote">
+            Already confirmed? <a asp-page="./Login">Sign in</a>
+        </p>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

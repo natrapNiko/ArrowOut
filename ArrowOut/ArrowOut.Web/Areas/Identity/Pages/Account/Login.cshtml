@@ -22,6 +22,15 @@
         <form id="account" method="post" asp-route-returnUrl="@Model.ReturnUrl" novalidate>
             <div asp-validation-summary="ModelOnly" class="ao-auth-alert" role="alert"></div>
 
+            @if (Model.NeedsConfirmation)
+            {
+                <p class="ao-auth-resend">
+                    <a asp-page="./ResendEmailConfirmation" asp-route-email="@Model.Input.Email">
+                        <i class="bi bi-envelope me-1" aria-hidden="true"></i>Send the confirmation e-mail again
+                    </a>
+                </p>
+            }
+
             <div class="form-floating mb-3">
                 <input asp-for="Input.Email" class="form-control" type="email" autocomplete="username" autofocus aria-required="true" placeholder="name@example.com" />
                 <label asp-for="Input.Email"></label>

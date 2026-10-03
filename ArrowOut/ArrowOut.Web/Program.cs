@@ -5,6 +5,7 @@ using ArrowOut.Data.Seeding;
 using ArrowOut.Services;
 using ArrowOut.Web.Infrastructure;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -31,7 +32,7 @@ builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
     {
         options.Stores.SchemaVersion = IdentitySchemaVersions.Version1; //matches the InitialCreate migration
-        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedAccount = true; // new players have to click the link in the e-mail first
         options.User.RequireUniqueEmail = true;
         options.Password.RequiredLength = 8;
         options.Password.RequireDigit = true;
@@ -62,6 +63,19 @@ builder.Services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInter
 // Our services
 builder.Services.AddArrowOutServices(builder.Configuration);
 builder.Services.AddScoped<IThemeResolver, ThemeResolver>();
+
+// E-mail. Without an SMTP server in the config nothing is sent, the mail just goes to the log.
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection(EmailOptions.SectionName));
+if (builder.Configuration.GetSection(EmailOptions.SectionName).Get<EmailOptions>()?.IsConfigured == true)
+{
+    builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+}
+else
+{
+    builder.Services.AddSingleton<IEmailSender, LogOnlyEmailSender>();
+}
+
+builder.Services.AddScoped<AccountEmails>();
 
 // MVC, API and security
 builder.Services.AddAntiforgery(options =>
