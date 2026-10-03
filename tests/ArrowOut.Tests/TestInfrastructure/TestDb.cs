@@ -71,7 +71,7 @@ internal static class TestDb
     public static IReadOnlyList<int> WinningTaps(Level level) =>
         level.Arrows.OrderByDescending(a => a.X).Select(a => a.Id).ToList();
 
-    // Tiny challenge with the same queue: ids 1, 2, 3 at (1,1), (2,1), (3,1), all pointing right,
+    // Tiny game with the same queue: ids 1, 2, 3 at (1,1), (2,1), (3,1), all pointing right,
     // so the only way to win is 3, 2, 1 (see ChallengeWinningTaps).
     public static Challenge QueueChallenge(string ownerId, ChallengeKind kind = ChallengeKind.Easy) => new(
         ownerId,

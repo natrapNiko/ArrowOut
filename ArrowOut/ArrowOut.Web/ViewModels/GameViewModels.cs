@@ -13,13 +13,16 @@ public sealed class ChallengeViewModel
 }
 
 // How each kind looks on the home page cards and the game page header.
-public sealed record ChallengeKindOption(ChallengeKind Kind, string Name, string Arrows, string Description, string Icon)
+public sealed record ChallengeKindOption(ChallengeKind Kind, string Name, string? Arrows, string Icon)
 {
     public static readonly IReadOnlyList<ChallengeKindOption> All =
     [
-        new(ChallengeKind.Easy, "Easy", "~40 arrows", "A small labyrinth to warm up or learn the rules.", "bi-emoji-smile"),
-        new(ChallengeKind.Medium, "Medium", "~200 arrows", "A proper maze of long, winding arrows.", "bi-lightning-charge"),
-        new(ChallengeKind.Hard, "Hard", "400–700 arrows", "A huge board. Zoom in, plan ahead, stay calm.", "bi-fire"),
+        new(ChallengeKind.Easy, "Easy", "~40 arrows", "bi-emoji-smile"),
+        new(ChallengeKind.Normal, "Normal", "~200 arrows", "bi-lightning-charge"),
+        new(ChallengeKind.Hard, "Hard", "400–700 arrows", "bi-fire"),
+
+        // No arrow count on purpose, the Challenge game should be a surprise.
+        new(ChallengeKind.Challenge, "Challenge", null, "bi-trophy"),
     ];
 
     public string CssClass => $"is-{Kind.ToString().ToLowerInvariant()}";
@@ -45,7 +48,7 @@ public sealed class LeaderboardViewModel
 
     public ChallengeKindOption Option => ChallengeKindOption.For(Kind);
 
-    // The board the player came from (win dialog), for a "Back to challenge" button.
+    // The board the player came from (win dialog), for a "Back to game" button.
     public int? FromChallengeId { get; init; }
 
     // The player's newest unfinished board, if it's a different one.

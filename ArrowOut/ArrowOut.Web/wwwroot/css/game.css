@@ -59,7 +59,7 @@
 
 .ao-board svg { width: 100%; height: 100%; display: block; overflow: hidden; }
 
-/* Challenge boards: a big window you can pan around that fills the screen height (a tall
+/* Game boards: a big window you can pan around that fills the screen height (a tall
    slice on phones) instead of a small square. */
 .ao-game-challenge { max-width: 1200px; }
 .ao-game-challenge .ao-board-wrap { min-width: 0; }

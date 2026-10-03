@@ -135,15 +135,21 @@ stars, one gets 2, and anything more gets 1. Hints don't cost you anything.
 The big boards don't fit on screen, so you can zoom with the mouse wheel or by pinching, and drag to move
 around. Dragging never counts as a tap, so you won't send an arrow flying by accident.
 
-## Challenges
+## Games
 
-Pick Easy, Medium or Hard on the home page and the game builds a brand-new random board just for you:
+Press "Start game" on the home page and you get a brand-new random board. The difficulty is random too, so
+you never know if it's going to be Easy, Normal or Hard until the board shows up:
 
 | Kind | Board size | Arrows | Arrow length | Points for a win |
 |---|---|---|---|---|
 | Easy | 16×16 | about 40 (at least 32) | 3 to 12 cells | 1 |
-| Medium | 41×41 to 43×43 | about 200 (at least 180) | 4 to 20 cells | 4 |
+| Normal | 41×41 to 43×43 | about 200 (at least 180) | 4 to 20 cells | 4 |
 | Hard | 66×66 to 82×82 | 400 to about 700 | 4 to 24 cells | 10 |
+
+Next to it there's a "Challenge game" button. That's its own mode with much bigger boards, worth 20 points a
+win, and it's never picked by "Start game". The site doesn't say anything else about it on purpose, so it's a
+surprise. The exact board sizes are in `ChallengeGenerator`. After a Challenge game, "Start new game" gives you
+another Challenge game.
 
 You only get the points for a board the first time you beat it. Replaying a board you've already won is fine,
 but it won't earn you any more points. Otherwise people could just farm the easy ones.
@@ -156,7 +162,7 @@ into your last unfinished board.
 
 ## Leaderboard
 
-There's a separate leaderboard for Easy, Medium and Hard. Players are ranked by points first, then by number
+There's a separate leaderboard for Easy, Normal, Hard and Challenge games. Players are ranked by points first, then by number
 of wins, then by stars, and finally by who made the fewest mistakes. It never shows e-mail addresses. If
 someone hasn't set a display name, only the first two letters of their e-mail are shown, followed by `***`.
 Admin accounts are left out completely.
@@ -195,7 +201,7 @@ of hearts are all rejected.
 
 The site has a cartoon style, with thick outlines, chunky buttons and bouncy dialogs. The arrows look like
 they were drawn with a soft black pencil on paper. On smaller boards they also get a bit of grain and
-wobble. The Medium and Hard boards skip that effect, because recalculating it for hundreds of arrows while
+wobble. The Normal, Hard and Challenge boards skip that effect, because recalculating it for hundreds of arrows while
 you pan around made scrolling laggy.
 
 There are four built-in themes: Peach Morning, Cocoa Night, Mint and Sunset. The light/dark button in the menu
@@ -209,7 +215,7 @@ Admins get a separate area with:
 
 - a dashboard with some totals
 - a level editor where you can draw arrows on a grid, check solvability live, generate a random layout, and
-  import or export levels as JSON. The game itself currently only uses challenges, but the levels are still
+  import or export levels as JSON. Players currently only play the random games, but the levels are still
   available through `/api/levels`.
 - user management: search, lock and unlock, promote and demote, delete. You can't lock yourself out.
 - theme upload. New themes are checked before they're saved. The built-in ones can't be deleted.
@@ -217,7 +223,7 @@ Admins get a separate area with:
 ## Database
 
 There's a single migration, `InitialCreate`, which sets up everything: the Identity tables, levels, arrows,
-player progress and challenges.
+player progress and games.
 
 To wipe everything and start fresh, drop the database. On the next start the app recreates it along with the
 admin and demo accounts:
@@ -236,9 +242,9 @@ dotnet ef database update --project ArrowOut/ArrowOut.Data --startup-project Arr
 
 The database checks its own data too. Board sizes must be between 3 and 96, lives between 1 and 5, arrows
 between 1 and 64 cells, and stars between 0 and 3. Level numbers are unique, and two arrows can't start on the
-same cell. Deleting a user also deletes their challenges and progress.
+same cell. Deleting a user also deletes their games and progress.
 
-A challenge board never changes after it's created, so I store it as one compact string instead of hundreds of
+A game board never changes after it's created, so I store it as one compact string instead of hundreds of
 rows. A Hard board can have around 700 arrows, so that saves a lot. Admin levels get edited arrow by arrow, so
 they keep a normal `Arrows` table.
 
@@ -258,7 +264,7 @@ they keep a normal `Arrows` table.
 | `Email:UserName` / `Email:Password` | empty | Login for the mail server (keep these in user secrets) |
 | `Email:FromAddress` / `Email:FromName` | empty / `ArrowOut` | Who the e-mails come from |
 
-About analytics: when it's turned on, the game sends an event when a challenge is created and another when it's
+About analytics: when it's turned on, the game sends an event when a game is created and another when it's
 won (kind, number of arrows, mistakes, hints used, points). Events go into a small in-memory queue and are
 sent in the background, so the game never waits on PostHog. If the queue fills up, the oldest events are
 dropped. User ids are hashed before anything leaves the server, so PostHog never sees e-mail addresses. With
@@ -272,15 +278,15 @@ scripts add for you.
 
 | Method | Route | What it does |
 |---|---|---|
-| POST | `/challenge/new` | Starts a new board (form field `kind`: Easy, Medium or Hard) and redirects to it |
-| GET | `/challenge/{id}` | The game page for one of your boards |
+| POST | `/game/new` | Starts a new board and redirects to it. No `kind` = random Easy/Normal/Hard, `kind=Challenge` = Challenge game |
+| GET | `/game/{id}` | The game page for one of your boards |
 | GET | `/leaderboard?kind=&page=` | The leaderboard page |
 | POST | `/theme/mode` | Switches light or dark mode (form fields `mode` and `returnUrl`) |
-| GET | `/api/challenges/{id}` | The board layout |
-| POST | `/api/challenges/{id}/attempts` | Records that you started or restarted |
-| POST | `/api/challenges/{id}/hint` | Asks for a hint for the current board state |
-| POST | `/api/challenges/{id}/moves` | Checks what a tap would do, without saving anything |
-| POST | `/api/challenges/{id}/completion` | Sends your taps so the server can check the win |
+| GET | `/api/games/{id}` | The board layout |
+| POST | `/api/games/{id}/attempts` | Records that you started or restarted |
+| POST | `/api/games/{id}/hint` | Asks for a hint for the current board state |
+| POST | `/api/games/{id}/moves` | Checks what a tap would do, without saving anything |
+| POST | `/api/games/{id}/completion` | Sends your taps so the server can check the win |
 | GET | `/api/leaderboard?kind=&page=&pageSize=` | The leaderboard as JSON |
 | GET | `/api/progress` | Your progress on the admin-made levels |
 | GET/POST | `/api/levels/...` | The same actions as above, for the admin-made levels |
@@ -313,7 +319,7 @@ dotnet test                               # C# tests (xUnit)
 node --test tests/js/engine.test.mjs      # checks that the JS engine matches the C# one
 ```
 
-The C# tests cover the game engine (moves, collisions, solver, hints, replay, generator), the challenge rules
+The C# tests cover the game engine (moves, collisions, solver, hints, replay, generator), the game rules
 (board sizes, points, replays, who can see which board), the leaderboard (ranking, hidden e-mails, no admins),
 themes and file storage (including injection and path tricks), the admin level editor, and the controllers
 and error handling. The JavaScript tests make sure the browser plays by exactly the same rules as the server.

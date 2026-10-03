@@ -204,7 +204,7 @@
             return;
         }
 
-        // A fixed amount per kind (Easy 1, Medium 4, Hard 10), only the first time you win a board.
+        // A fixed amount per kind (Easy 1, Normal 4, Hard 10, Challenge 20), only the first time you win a board.
         const format = n => n.toLocaleString();
         const plural = n => (n === 1 ? ' point' : ' points');
         const badge = document.querySelector('.ao-kind-badge');
@@ -503,9 +503,7 @@
     // Bootstrap only shows one modal at a time: close the current one, wait until it's gone, then open the next.
 
     const winElement = document.getElementById('winModal');
-    const pickerElement = document.getElementById('pickerModal');
     const confirmElement = document.getElementById('confirmModal');
-    const picker = pickerElement ? new bootstrap.Modal(pickerElement) : null;
     const confirmDialog = confirmElement ? new bootstrap.Modal(confirmElement) : null;
 
     function anyDialogOpen() {
@@ -580,34 +578,10 @@
         }
     }
 
-    // "Other challenges": pick Easy/Medium/Hard in a pop-up instead of going back to the home page.
-    async function openPicker() {
-        if (!picker) {
-            return;
-        }
-        await hideThen(ui.winModal, winElement);
-
-        let leaving = false;
-        const onSubmit = () => { leaving = true; }; // they picked a card, the page is about to change
-        pickerElement.addEventListener('submit', onSubmit);
-        pickerElement.addEventListener('hidden.bs.modal', () => {
-            pickerElement.removeEventListener('submit', onSubmit);
-            if (!leaving && state.finished && state.board && state.board.isCleared) {
-                ui.winModal.show(); // cancelled, go back to the result
-            }
-        }, { once: true });
-        picker.show();
-    }
-
     ui.hintButton.addEventListener('click', hint);
     ui.restartButton.addEventListener('click', () => requestRestart(false));
     document.getElementById('retryButton').addEventListener('click', restart); // they lost anyway, so no need to ask
     document.getElementById('replayButton').addEventListener('click', () => requestRestart(true));
-
-    const otherChallengesButton = document.getElementById('otherChallengesButton');
-    if (otherChallengesButton) {
-        otherChallengesButton.addEventListener('click', openPicker);
-    }
 
     load();
 }());

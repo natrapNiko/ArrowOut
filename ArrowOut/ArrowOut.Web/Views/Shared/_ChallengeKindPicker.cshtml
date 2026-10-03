@@ -1,18 +1,21 @@
-@* The Easy / Medium / Hard cards. Each card is its own POST form (with CSRF protection) that
-   makes a new random board of that kind. Used on the home page and in the "Other challenges" pop-up. *@
-<div class="ao-kind-picker mx-auto">
-    @foreach (var option in ChallengeKindOption.All)
-    {
-        <form method="post" asp-area="" asp-controller="Challenge" asp-action="New" data-busy-text="Building…">
-            <input type="hidden" name="kind" value="@option.Kind" />
-            <button type="submit" class="ao-kind-card @option.CssClass">
-                <span class="ao-kind-icon" aria-hidden="true"><i class="bi @option.Icon"></i></span>
-                <span class="ao-kind-name">@option.Name</span>
-                <span class="ao-kind-arrows">@option.Arrows</span>
-                <span class="ao-kind-text">@option.Description</span>
-                <span class="ao-kind-points"><i class="bi bi-trophy-fill" aria-hidden="true"></i> @option.PointsLabel per win</span>
-                <span class="ao-kind-go">Start <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
-            </button>
-        </form>
-    }
+@* The two start buttons on the home page. Both are POST forms, so they get CSRF protection.
+   "Start game" sends no kind, so the server picks Easy, Normal or Hard at random.
+   "Challenge game" is its own mode. On purpose there's no info about it here. *@
+<div class="ao-kind-picker ao-kind-picker-pair mx-auto">
+    <form method="post" asp-area="" asp-controller="Challenge" asp-action="New" data-busy-text="Building…">
+        <button type="submit" class="ao-kind-card ao-start-card">
+            <span class="ao-kind-icon" aria-hidden="true"><i class="bi bi-shuffle"></i></span>
+            <span class="ao-kind-name">Start game</span>
+            <span class="ao-kind-go">Play <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+        </button>
+    </form>
+
+    <form method="post" asp-area="" asp-controller="Challenge" asp-action="New" data-busy-text="Building…">
+        <input type="hidden" name="kind" value="@ChallengeKind.Challenge" />
+        <button type="submit" class="ao-kind-card ao-start-card is-challenge">
+            <span class="ao-kind-icon" aria-hidden="true"><i class="bi bi-trophy"></i></span>
+            <span class="ao-kind-name">Challenge game</span>
+            <span class="ao-kind-go">Play <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+        </button>
+    </form>
 </div>

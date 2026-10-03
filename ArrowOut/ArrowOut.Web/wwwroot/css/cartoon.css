@@ -196,7 +196,7 @@ a:not(.btn, .nav-link, .page-link, .dropdown-item, .navbar-brand, [class*="ao-"]
 .form-check-input { border: 2.5px solid var(--toon-ink); }
 .ao-auth .form-floating > .form-control { border-radius: 14px; }
 
-/* ---------- Challenge cards & badges: stickers ---------- */
+/* ---------- Game cards & badges: stickers ---------- */
 
 .ao-kind-picker { gap: 1.4rem; }
 

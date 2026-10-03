@@ -12,7 +12,7 @@ public interface ILeaderboardService
     Task<PagedResult<LeaderboardEntry>> GetPageAsync(ChallengeKind kind, int page, int pageSize, CancellationToken cancellationToken = default);
 }
 
-// Separate rankings for Easy, Medium and Hard. Sorted by points on that kind, then number of
+// Separate rankings for Easy, Normal, Hard and Challenge. Sorted by points on that kind, then number of
 // wins, then stars, then fewest mistakes. It's all worked out in SQL.
 // Admins are left out, since their games are just testing.
 public sealed class LeaderboardService(ApplicationDbContext dbContext) : ILeaderboardService

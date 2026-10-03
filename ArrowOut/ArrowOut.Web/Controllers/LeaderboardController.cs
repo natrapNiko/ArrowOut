@@ -43,7 +43,7 @@ public class LeaderboardController(ILeaderboardService leaderboardService, IChal
         {
             Kind = kind,
             Entries = entries,
-            // It's just a link. The challenge page checks the board really belongs to the player.
+            // It's just a link. The game page checks the board really belongs to the player.
             FromChallengeId = from is > 0 ? from : null,
             UnfinishedChallengeId = unfinishedId == from ? null : unfinishedId,
         });

@@ -1,7 +1,7 @@
 @model ChallengeViewModel
 @{
     var challenge = Model.Challenge;
-    ViewData["Title"] = $"Challenge #{challenge.Id}";
+    ViewData["Title"] = $"Game #{challenge.Id}";
 }
 
 @section Styles {
@@ -12,12 +12,12 @@
 <div id="game" class="ao-game ao-game-challenge"
      data-level-id="@challenge.Id"
      data-max-lives="@challenge.MaxLives"
-     data-api-base="@Url.Content("~/api/challenges")">
+     data-api-base="@Url.Content("~/api/games")">
 
     <div class="ao-game-header">
         <a class="btn btn-icon" asp-controller="Home" asp-action="Index" aria-label="Back to home"><i class="bi bi-house"></i></a>
         <div class="ao-game-title">
-            <div class="ao-game-level">Challenge #@challenge.Id <span class="ao-kind-badge @Model.Kind.CssClass">@Model.Kind.Name</span></div>
+            <div class="ao-game-level">Game #@challenge.Id <span class="ao-kind-badge @Model.Kind.CssClass">@Model.Kind.Name</span></div>
             <div class="ao-game-name text-truncate">Clear every arrow to win</div>
         </div>
         <div class="ao-lives" id="lives" aria-live="polite" aria-label="@challenge.MaxLives lives remaining">

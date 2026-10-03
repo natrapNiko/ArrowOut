@@ -69,15 +69,15 @@ public class LeaderboardAndAnalyticsTests : IDisposable
         await TestDb.AddUserAsync(_db, "bob", "Bob");
         await TestDb.AddUserAsync(_db, "carol", "Carol");
 
-        // Medium wins are 4 points each no matter how many crashes. Alice and Bob have the same
+        // Normal wins are 4 points each no matter how many crashes. Alice and Bob have the same
         // points, but Bob never crashed (more stars) so he's ahead.
-        await TestDb.AddChallengeAsync(_db, "alice", wonWithMistakes: 2, kind: ChallengeKind.Medium);
-        await TestDb.AddChallengeAsync(_db, "alice", wonWithMistakes: 2, kind: ChallengeKind.Medium);
-        await TestDb.AddChallengeAsync(_db, "bob", wonWithMistakes: 0, kind: ChallengeKind.Medium);
-        await TestDb.AddChallengeAsync(_db, "bob", wonWithMistakes: 0, kind: ChallengeKind.Medium);
-        await TestDb.AddChallengeAsync(_db, "carol", wonWithMistakes: 0, kind: ChallengeKind.Medium);
+        await TestDb.AddChallengeAsync(_db, "alice", wonWithMistakes: 2, kind: ChallengeKind.Normal);
+        await TestDb.AddChallengeAsync(_db, "alice", wonWithMistakes: 2, kind: ChallengeKind.Normal);
+        await TestDb.AddChallengeAsync(_db, "bob", wonWithMistakes: 0, kind: ChallengeKind.Normal);
+        await TestDb.AddChallengeAsync(_db, "bob", wonWithMistakes: 0, kind: ChallengeKind.Normal);
+        await TestDb.AddChallengeAsync(_db, "carol", wonWithMistakes: 0, kind: ChallengeKind.Normal);
 
-        var page = await new LeaderboardService(_db).GetPageAsync(ChallengeKind.Medium, 1, 10);
+        var page = await new LeaderboardService(_db).GetPageAsync(ChallengeKind.Normal, 1, 10);
 
         Assert.Equal(
             [("Bob", 8, 2), ("Alice", 8, 2), ("Carol", 4, 1)],
@@ -98,7 +98,7 @@ public class LeaderboardAndAnalyticsTests : IDisposable
 
         var service = new LeaderboardService(_db);
         var easy = await service.GetPageAsync(ChallengeKind.Easy, 1, 10);
-        var medium = await service.GetPageAsync(ChallengeKind.Medium, 1, 10);
+        var medium = await service.GetPageAsync(ChallengeKind.Normal, 1, 10);
         var hard = await service.GetPageAsync(ChallengeKind.Hard, 1, 10);
 
         Assert.Equal([("Alice", 3)], easy.Items.Select(e => (e.PlayerName, e.ChallengesWon)));

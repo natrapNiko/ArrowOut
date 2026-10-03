@@ -243,7 +243,7 @@ a.ao-level-card:focus-visible { transform: translateY(-2px); box-shadow: 0 6px 2
 
 .ao-rules li { margin-bottom: .6rem; }
 
-/* ---------- Challenge kinds (home page cards, play page badge) ---------- */
+/* ---------- Game kinds (home page cards, play page badge) ---------- */
 .ao-kind-picker {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -253,6 +253,10 @@ a.ao-level-card:focus-visible { transform: translateY(-2px); box-shadow: 0 6px 2
 }
 
 .ao-kind-picker form { display: flex; }
+
+/* The two start cards ("Start game" and "Challenge game"), side by side and centred. */
+.ao-kind-picker-pair { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); max-width: 30rem; }
+.ao-start-card { align-items: center; text-align: center; gap: .6rem; padding-block: 1.5rem; }
 
 .ao-kind-card {
     --kind: var(--ao-accent);
@@ -281,8 +285,9 @@ a.ao-level-card:focus-visible { transform: translateY(-2px); box-shadow: 0 6px 2
 .ao-kind-card:disabled { opacity: .7; transform: none; }
 
 .ao-kind-card.is-easy, .ao-kind-badge.is-easy { --kind: var(--ao-success); }
-.ao-kind-card.is-medium, .ao-kind-badge.is-medium { --kind: var(--ao-accent); }
+.ao-kind-card.is-normal, .ao-kind-badge.is-normal { --kind: var(--ao-accent); }
 .ao-kind-card.is-hard, .ao-kind-badge.is-hard { --kind: var(--ao-danger); }
+.ao-kind-card.is-challenge, .ao-kind-badge.is-challenge { --kind: #8b5cf6; } /* purple, so it stands out from the three normal kinds */
 
 .ao-kind-icon {
     display: inline-grid;
@@ -345,8 +350,9 @@ a.ao-level-card:focus-visible { transform: translateY(-2px); box-shadow: 0 6px 2
 }
 
 .ao-kind-tab.is-easy { --kind: var(--ao-success); }
-.ao-kind-tab.is-medium { --kind: var(--ao-accent); }
+.ao-kind-tab.is-normal { --kind: var(--ao-accent); }
 .ao-kind-tab.is-hard { --kind: var(--ao-danger); }
+.ao-kind-tab.is-challenge { --kind: #8b5cf6; }
 
 .ao-kind-tab small { font-weight: 500; font-size: .75rem; opacity: .8; width: 100%; text-align: center; }
 .ao-kind-tab:hover { color: var(--kind); }

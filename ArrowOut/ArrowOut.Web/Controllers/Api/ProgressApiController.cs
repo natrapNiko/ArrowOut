@@ -16,7 +16,7 @@ public class ProgressApiController(ILevelService levelService, ILeaderboardServi
     public async Task<ActionResult<ProgressSummary>> GetProgress(CancellationToken cancellationToken) =>
         Ok(await levelService.GetProgressSummaryAsync(CurrentUserId, cancellationToken));
 
-    // GET /api/leaderboard?kind=Easy|Medium|Hard&page=&pageSize=: public, no login needed.
+    // GET /api/leaderboard?kind=Easy|Normal|Hard|Challenge&page=&pageSize=: public, no login needed.
     [HttpGet("leaderboard")]
     [AllowAnonymous]
     [ProducesResponseType<PagedResult<LeaderboardEntry>>(StatusCodes.Status200OK)]

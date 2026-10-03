@@ -46,6 +46,37 @@ public class MvcControllerTests
         Assert.Equal(42, redirect.RouteValues!["id"]);
     }
 
+    [Fact]
+    public async Task ChallengeNew_WithoutAKind_PicksARandomOne()
+    {
+        var picked = new List<ChallengeKind>();
+        var challenges = new Mock<IChallengeService>();
+        challenges.Setup(s => s.CreateAsync("u", It.IsAny<ChallengeKind>(), It.IsAny<CancellationToken>()))
+            .Callback<string, ChallengeKind, CancellationToken>((_, kind, _) => picked.Add(kind))
+            .ReturnsAsync(1);
+        var controller = new ChallengeController(challenges.Object).WithUser("u");
+
+        for (var i = 0; i < 60; i++)
+        {
+            Assert.IsType<RedirectToActionResult>(await controller.New(null, CancellationToken.None));
+        }
+
+        // Only Easy, Normal or Hard (never the Challenge game), and after 60 tries each has come up.
+        Assert.DoesNotContain(ChallengeKind.Challenge, picked);
+        Assert.Equal([ChallengeKind.Easy, ChallengeKind.Normal, ChallengeKind.Hard], picked.Distinct().Order());
+    }
+
+    [Fact]
+    public async Task ChallengeNew_ChallengeButton_StartsAChallengeGame()
+    {
+        var challenges = new Mock<IChallengeService>();
+        challenges.Setup(s => s.CreateAsync("u", ChallengeKind.Challenge, It.IsAny<CancellationToken>())).ReturnsAsync(9);
+
+        var result = await new ChallengeController(challenges.Object).WithUser("u").New(ChallengeKind.Challenge, CancellationToken.None);
+
+        Assert.Equal(9, Assert.IsType<RedirectToActionResult>(result).RouteValues!["id"]);
+    }
+
     [Theory]
     [InlineData(ChallengeKind.Hard, ChallengeKind.Hard)]
     [InlineData((ChallengeKind)42, ChallengeKind.Easy)] // tampered ?kind= falls back to the first tab
@@ -83,7 +114,7 @@ public class MvcControllerTests
             .ReturnsAsync(new ChallengeSummary(3, 1, 3, 4, unfinished));
 
         var result = await new LeaderboardController(leaderboard.Object, challenges.Object).WithUser("u")
-            .Index(ChallengeKind.Medium, 1, from, CancellationToken.None);
+            .Index(ChallengeKind.Normal, 1, from, CancellationToken.None);
 
         var model = Assert.IsType<LeaderboardViewModel>(Assert.IsType<ViewResult>(result).Model);
         Assert.Equal((expectedFrom, expectedUnfinished), (model.FromChallengeId, model.UnfinishedChallengeId));

@@ -12,9 +12,9 @@
        encodes the JSON in the attribute so it can't break out of it. *@
     <div class="ao-hero-demo mx-auto mb-4" id="heroDemo" aria-hidden="true" data-boards="@HomeDemo.Json"></div>
 
-    <h1 class="display-5 fw-semibold mb-3">Pick a challenge. Find the way out.</h1>
+    <h1 class="display-5 fw-semibold mb-3">Start a game. Find the way out.</h1>
     <p class="lead text-muted mx-auto" style="max-width: 38rem">
-        Every challenge is a brand-new random labyrinth of long, twisting arrows — from 40 to 700 of them.
+        Every game is a brand-new random labyrinth of long, twisting arrows — from 40 to 700 of them.
         Tap an arrow and it slides out along its path. Hit another arrow and you lose a heart.
     </p>
 
@@ -27,7 +27,7 @@
         @if (summary.UnfinishedId is { } unfinished)
         {
             <a class="btn btn-outline-ao mt-3" asp-controller="Challenge" asp-action="Play" asp-route-id="@unfinished">
-                <i class="bi bi-play-fill me-1"></i>Continue challenge #@unfinished
+                <i class="bi bi-play-fill me-1"></i>Continue game #@unfinished
             </a>
         }
     }

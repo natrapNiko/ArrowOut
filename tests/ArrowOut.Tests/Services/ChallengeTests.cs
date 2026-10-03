@@ -46,9 +46,19 @@ public class ChallengeTests : IDisposable
         Assert.True(new GreedySolver().Solve(board).IsSolvable);
     }
 
+    [Fact]
+    public void Generate_ChallengeGame_Has600To1000Arrows_AndIsAFullSolvableBoard()
+    {
+        var challenge = ChallengeGenerator.Generate(7, ChallengeKind.Challenge);
+
+        Assert.InRange(challenge.Arrows.Count, 600, 1000);
+        Assert.Equal(challenge.Width * challenge.Height, challenge.Arrows.Sum(a => a.Length));
+        Assert.True(new GreedySolver().Solve(Board.Create(challenge.Width, challenge.Height, challenge.Arrows)).IsSolvable);
+    }
+
     [Theory]
     [InlineData(ChallengeKind.Easy, 32, 50)]
-    [InlineData(ChallengeKind.Medium, 180, 230)]
+    [InlineData(ChallengeKind.Normal, 180, 230)]
     public void Generate_EachKindHasItsArrowCount_AndIsAFullSolvableBoard(ChallengeKind kind, int min, int max)
     {
         for (var seed = 1; seed <= 3; seed++)
@@ -174,13 +184,13 @@ public class ChallengeTests : IDisposable
     {
         await TestDb.AddUserAsync(_db, TestDb.PlayerId);
 
-        var id = await CreateService().CreateAsync(TestDb.PlayerId, ChallengeKind.Medium);
+        var id = await CreateService().CreateAsync(TestDb.PlayerId, ChallengeKind.Normal);
 
         var stored = await _db.Challenges.SingleAsync();
         Assert.Equal(id, stored.Id);
         Assert.Equal(TestDb.PlayerId, stored.OwnerId);
-        Assert.Equal(ChallengeKind.Medium, stored.Kind);
-        Assert.True(stored.ArrowCount >= ChallengeGenerator.MinArrows(ChallengeKind.Medium));
+        Assert.Equal(ChallengeKind.Normal, stored.Kind);
+        Assert.True(stored.ArrowCount >= ChallengeGenerator.MinArrows(ChallengeKind.Normal));
         Assert.Equal(stored.ArrowCount, stored.GetArrows().Count);
         Assert.False(stored.IsCompleted);
     }
@@ -219,7 +229,7 @@ public class ChallengeTests : IDisposable
         var stored = await _db.Challenges.SingleAsync();
         Assert.True(stored.IsCompleted);
         Assert.Equal(3, stored.Stars);
-        _analytics.Verify(a => a.Track("challenge_completed", TestDb.PlayerId, It.IsAny<IReadOnlyDictionary<string, object?>>()), Times.Once);
+        _analytics.Verify(a => a.Track("game_completed", TestDb.PlayerId, It.IsAny<IReadOnlyDictionary<string, object?>>()), Times.Once);
     }
 
     [Fact]
@@ -250,8 +260,9 @@ public class ChallengeTests : IDisposable
 
     [Theory]
     [InlineData(ChallengeKind.Easy, 1)]
-    [InlineData(ChallengeKind.Medium, 4)]
+    [InlineData(ChallengeKind.Normal, 4)]
     [InlineData(ChallengeKind.Hard, 10)]
+    [InlineData(ChallengeKind.Challenge, 20)]
     public void Points_AreAFixedAmountPerKind(ChallengeKind kind, int expected)
     {
         Assert.Equal(expected, Challenge.PointsFor(kind));
@@ -263,7 +274,7 @@ public class ChallengeTests : IDisposable
     [InlineData(2)] // crashes don't change the points
     public void Points_WinningABoardScoresOnce_ReplaysEarnNothingMore(int mistakes)
     {
-        var challenge = TestDb.QueueChallenge(TestDb.PlayerId, ChallengeKind.Medium);
+        var challenge = TestDb.QueueChallenge(TestDb.PlayerId, ChallengeKind.Normal);
 
         var first = challenge.RecordWin(mistakes, DateTime.UtcNow);
         Assert.Equal((4, 4), (first.Points, first.PointsGained));

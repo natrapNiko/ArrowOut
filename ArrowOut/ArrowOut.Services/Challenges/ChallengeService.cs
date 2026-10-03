@@ -33,7 +33,7 @@ public interface IChallengeService
     Task<ChallengeSummary> GetSummaryAsync(string userId, CancellationToken cancellationToken = default);
 }
 
-// Challenges are the whole game now. A board belongs to whoever started it. Anyone else gets
+// Games are the only mode now. A board belongs to whoever started it. Anyone else gets
 // a 404, same as if the board didn't exist, so you can't find other boards by guessing ids.
 public sealed class ChallengeService(
     ApplicationDbContext dbContext,
@@ -52,7 +52,7 @@ public sealed class ChallengeService(
         dbContext.Challenges.Add(challenge);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        analytics.Track("challenge_created", userId, new Dictionary<string, object?>
+        analytics.Track("game_created", userId, new Dictionary<string, object?>
         {
             ["kind"] = kind.ToString(),
             ["arrows"] = challenge.ArrowCount,
@@ -71,7 +71,7 @@ public sealed class ChallengeService(
             .Where(c => c.Id == challengeId && c.OwnerId == userId)
             .Select(c => new ChallengeInfo(c.Id, c.Kind, c.Width, c.Height, c.ArrowCount, c.MaxLives, c.IsCompleted, c.Stars))
             .FirstOrDefaultAsync(cancellationToken)
-            ?? throw new EntityNotFoundException("Challenge", challengeId);
+            ?? throw new EntityNotFoundException("Game", challengeId);
     }
 
     public async Task<ChallengeBoardDto> GetBoardAsync(int challengeId, string userId, CancellationToken cancellationToken = default)
@@ -134,14 +134,14 @@ public sealed class ChallengeService(
         if (!replay.IsValid)
         {
             logger.LogWarning(
-                "Rejected tampered or corrupt replay for challenge {ChallengeId} by {UserId}: {Error}", challengeId, userId, replay.Error);
+                "Rejected tampered or corrupt replay for game {GameId} by {UserId}: {Error}", challengeId, userId, replay.Error);
             throw new InvalidGameStateException(replay.Error ?? "The move sequence is not valid.");
         }
 
         if (!replay.IsWin)
         {
             throw new InvalidGameStateException(replay.LivesExhausted
-                ? "All lives were lost; the challenge was not completed."
+                ? "All lives were lost; the game was not completed."
                 : "The board is not cleared yet.");
         }
 
@@ -150,7 +150,7 @@ public sealed class ChallengeService(
         var win = challenge.RecordWin(replay.Mistakes, timeProvider.GetUtcNow().UtcDateTime);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        analytics.Track("challenge_completed", userId, new Dictionary<string, object?>
+        analytics.Track("game_completed", userId, new Dictionary<string, object?>
         {
             ["kind"] = challenge.Kind.ToString(),
             ["arrows"] = challenge.ArrowCount,
@@ -224,6 +224,6 @@ public sealed class ChallengeService(
 
         var query = tracking ? dbContext.Challenges : dbContext.Challenges.AsNoTracking();
         return await query.FirstOrDefaultAsync(c => c.Id == challengeId && c.OwnerId == userId, cancellationToken)
-            ?? throw new EntityNotFoundException("Challenge", challengeId);
+            ?? throw new EntityNotFoundException("Game", challengeId);
     }
 }

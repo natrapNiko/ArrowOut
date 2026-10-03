@@ -104,13 +104,14 @@ public class Challenge : BaseAuditableModel<int>
         return new ChallengeWin(points, gained, isNewBest);
     }
 
-    // Easy 1, Medium 4, Hard 10. Doesn't matter how many arrows the board had.
+    // Easy 1, Normal 4, Hard 10, Challenge 20. Doesn't matter how many arrows the board had.
     public static int PointsFor(ChallengeKind kind) => kind switch
     {
         ChallengeKind.Easy => 1,
-        ChallengeKind.Medium => 4,
+        ChallengeKind.Normal => 4,
         ChallengeKind.Hard => 10,
-        _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown challenge kind."),
+        ChallengeKind.Challenge => 20,
+        _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown game kind."),
     };
 
     public IReadOnlyList<ArrowPiece> GetArrows() => DecodeLayout(Layout);
@@ -149,7 +150,7 @@ public class Challenge : BaseAuditableModel<int>
                     || !int.TryParse(entry.AsSpan(0, separator), NumberStyles.None, CultureInfo.InvariantCulture, out var direction)
                     || !Enum.IsDefined((Direction)direction))
                 {
-                    throw new FormatException($"Invalid challenge layout entry #{index + 1}.");
+                    throw new FormatException($"Invalid game layout entry #{index + 1}.");
                 }
 
                 return new ArrowPiece(index + 1, Arrow.DecodePath(entry[(separator + 1)..]), (Direction)direction);

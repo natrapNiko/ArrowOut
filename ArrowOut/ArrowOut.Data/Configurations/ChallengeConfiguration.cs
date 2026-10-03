@@ -19,7 +19,7 @@ public class ChallengeConfiguration : IEntityTypeConfiguration<Challenge>
             table.HasCheckConstraint("CK_Challenges_Stars", $"[Stars] BETWEEN 0 AND {DataConstants.Progress.StarsMax}");
             table.HasCheckConstraint("CK_Challenges_BestMistakes", "[BestMistakes] IS NULL OR [BestMistakes] >= 0");
             table.HasCheckConstraint("CK_Challenges_Attempts", "[Attempts] >= 0");
-            table.HasCheckConstraint("CK_Challenges_Kind", "[Kind] BETWEEN 0 AND 2");
+            table.HasCheckConstraint("CK_Challenges_Kind", "[Kind] BETWEEN 0 AND 3");
             table.HasCheckConstraint("CK_Challenges_Points", "[Points] >= 0 AND [HintsThisAttempt] >= 0");
         });
 

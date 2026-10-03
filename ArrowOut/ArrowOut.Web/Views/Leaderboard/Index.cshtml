@@ -4,28 +4,32 @@
 }
 
 <h1 class="h2 mb-1">Leaderboard</h1>
-<p class="text-muted">A separate ranking for each challenge type, by points. Every board you clear scores once: <strong>Easy 1 point</strong>, <strong>Medium 4</strong>, <strong>Hard 10</strong>. Ties are broken by stars, then fewest mistakes.</p>
+<p class="text-muted">A separate ranking for each game type, by points. Every board you clear scores once: <strong>Easy 1 point</strong>, <strong>Normal 4</strong>, <strong>Hard 10</strong>, <strong>Challenge 20</strong>. Ties are broken by stars, then fewest mistakes.</p>
 
-@* Buttons back into the game: a new board of this tab's kind, the board you came from, or an unfinished one. *@
+@* Buttons back into the game: a new random game, the board you came from, or an unfinished one. *@
 <div class="ao-leaderboard-actions mb-4">
     @if (User.Identity?.IsAuthenticated == true)
     {
         <form method="post" asp-controller="Challenge" asp-action="New" data-busy-text="Building…" class="m-0">
-            <input type="hidden" name="kind" value="@Model.Kind" />
+            @* On the Challenge tab this starts a Challenge game, everywhere else a random one. *@
+            @if (Model.Kind == ChallengeKind.Challenge)
+            {
+                <input type="hidden" name="kind" value="@ChallengeKind.Challenge" />
+            }
             <button type="submit" class="btn btn-ao">
-                <i class="bi bi-shuffle me-1" aria-hidden="true"></i>Start new @Model.Option.Name challenge
+                <i class="bi bi-shuffle me-1" aria-hidden="true"></i>@(Model.Kind == ChallengeKind.Challenge ? "Start new Challenge game" : "Start new game")
             </button>
         </form>
         @if (Model.FromChallengeId is { } from)
         {
             <a class="btn btn-outline-ao" asp-controller="Challenge" asp-action="Play" asp-route-id="@from">
-                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Back to challenge #@from
+                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Back to game #@from
             </a>
         }
         @if (Model.UnfinishedChallengeId is { } unfinished)
         {
             <a class="btn btn-outline-ao" asp-controller="Challenge" asp-action="Play" asp-route-id="@unfinished">
-                <i class="bi bi-play-fill me-1" aria-hidden="true"></i>Continue challenge #@unfinished
+                <i class="bi bi-play-fill me-1" aria-hidden="true"></i>Continue game #@unfinished
             </a>
         }
     }
@@ -38,7 +42,7 @@
 </div>
 
 @* Normal links, not JS tabs, so every ranking has its own URL, works without JavaScript and can be shared. *@
-<nav class="ao-kind-tabs mb-3" aria-label="Challenge type">
+<nav class="ao-kind-tabs mb-3" aria-label="Game type">
     @foreach (var option in ChallengeKindOption.All)
     {
         var active = option.Kind == Model.Kind;
@@ -47,7 +51,10 @@
            aria-current="@(active ? "page" : null)">
             <i class="bi @option.Icon" aria-hidden="true"></i>
             <span>@option.Name</span>
-            <small>@option.Arrows</small>
+            @if (option.Arrows is not null)
+            {
+                <small>@option.Arrows</small>
+            }
         </a>
     }
 </nav>
