@@ -77,13 +77,11 @@ public class MvcControllerTests
         Assert.Equal(9, Assert.IsType<RedirectToActionResult>(result).RouteValues!["id"]);
     }
 
-    [Theory]
-    [InlineData(ChallengeKind.Hard, ChallengeKind.Hard)]
-    [InlineData((ChallengeKind)42, ChallengeKind.Easy)] // tampered ?kind= falls back to the first tab
-    public async Task Leaderboard_ShowsTheRankingOfTheSelectedKind(ChallengeKind requested, ChallengeKind shown)
+    [Fact]
+    public async Task Leaderboard_ShowsTheOneRankingForAllGames()
     {
         var leaderboard = new Mock<ILeaderboardService>();
-        leaderboard.Setup(s => s.GetPageAsync(shown, 1, LeaderboardController.PageSize, It.IsAny<CancellationToken>()))
+        leaderboard.Setup(s => s.GetPageAsync(1, LeaderboardController.PageSize, It.IsAny<CancellationToken>()))
             .ReturnsAsync(PagedResult<LeaderboardEntry>.Empty());
 
         var controller = new LeaderboardController(leaderboard.Object, Mock.Of<IChallengeService>())
@@ -91,13 +89,12 @@ public class MvcControllerTests
             ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() }, // a visitor
         };
 
-        var result = await controller.Index(requested, 1, from: 7, CancellationToken.None);
+        var result = await controller.Index(1, from: 7, CancellationToken.None);
 
         var model = Assert.IsType<LeaderboardViewModel>(Assert.IsType<ViewResult>(result).Model);
-        Assert.Equal(shown, model.Kind);
-        Assert.Equal(shown.ToString(), model.Pagination.RouteValues["kind"]);
+        Assert.False(model.Pagination.RouteValues.ContainsKey("kind"));
         Assert.Null(model.FromChallengeId); // visitors have no game to go back to
-        leaderboard.Verify(s => s.GetPageAsync(shown, 1, LeaderboardController.PageSize, It.IsAny<CancellationToken>()), Times.Once);
+        leaderboard.Verify(s => s.GetPageAsync(1, LeaderboardController.PageSize, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Theory]
@@ -107,14 +104,14 @@ public class MvcControllerTests
     public async Task Leaderboard_OffersTheWayBackIntoTheGame(int? from, int? unfinished, int? expectedFrom, int? expectedUnfinished)
     {
         var leaderboard = new Mock<ILeaderboardService>();
-        leaderboard.Setup(s => s.GetPageAsync(It.IsAny<ChallengeKind>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+        leaderboard.Setup(s => s.GetPageAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(PagedResult<LeaderboardEntry>.Empty());
         var challenges = new Mock<IChallengeService>();
         challenges.Setup(s => s.GetSummaryAsync("u", It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ChallengeSummary(3, 1, 3, 4, unfinished));
 
         var result = await new LeaderboardController(leaderboard.Object, challenges.Object).WithUser("u")
-            .Index(ChallengeKind.Normal, 1, from, CancellationToken.None);
+            .Index(1, from, CancellationToken.None);
 
         var model = Assert.IsType<LeaderboardViewModel>(Assert.IsType<ViewResult>(result).Model);
         Assert.Equal((expectedFrom, expectedUnfinished), (model.FromChallengeId, model.UnfinishedChallengeId));

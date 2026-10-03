@@ -42,11 +42,7 @@ public sealed record ChallengeKindOption(ChallengeKind Kind, string Name, string
 
 public sealed class LeaderboardViewModel
 {
-    public required ChallengeKind Kind { get; init; }
-
     public required PagedResult<LeaderboardEntry> Entries { get; init; }
-
-    public ChallengeKindOption Option => ChallengeKindOption.For(Kind);
 
     // The board the player came from (win dialog), for a "Back to game" button.
     public int? FromChallengeId { get; init; }
@@ -54,10 +50,9 @@ public sealed class LeaderboardViewModel
     // The player's newest unfinished board, if it's a different one.
     public int? UnfinishedChallengeId { get; init; }
 
-    // Page links keep the current tab (and the way back to the game).
+    // Page links keep the way back to the game.
     public PaginationViewModel Pagination => new(Entries, "Index", new Dictionary<string, string?>
     {
-        ["kind"] = Kind.ToString(),
         ["from"] = FromChallengeId?.ToString(System.Globalization.CultureInfo.InvariantCulture),
     });
 }

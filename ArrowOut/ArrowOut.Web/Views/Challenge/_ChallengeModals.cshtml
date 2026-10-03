@@ -34,10 +34,10 @@
                 <div class="d-flex w-100 gap-2 m-0">
                     <button type="button" class="btn btn-outline-ao flex-fill" id="replayButton"><i class="bi bi-arrow-counterclockwise me-1"></i>Replay</button>
                 </div>
-                @* Goes straight to the tab you just played (e.g. Easy after an Easy win). *@
+                @* The leaderboard, with a "Back to game" button that brings you back here. *@
                 <a class="btn btn-outline-ao w-100 m-0 ao-win-leaderboard" id="leaderboardButton"
-                   asp-controller="Leaderboard" asp-action="Index" asp-route-kind="@Model.Kind" asp-route-from="@Model.Id">
-                    <i class="bi bi-trophy-fill me-1" aria-hidden="true"></i>@ChallengeKindOption.For(Model.Kind).Name leaderboard
+                   asp-controller="Leaderboard" asp-action="Index" asp-route-from="@Model.Id">
+                    <i class="bi bi-trophy-fill me-1" aria-hidden="true"></i>Leaderboard
                 </a>
             </div>
         </div>

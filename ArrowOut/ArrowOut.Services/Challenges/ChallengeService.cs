@@ -161,7 +161,7 @@ public sealed class ChallengeService(
         });
 
         var totalPoints = await dbContext.Challenges
-            .Where(c => c.OwnerId == userId && c.Kind == challenge.Kind && c.IsCompleted)
+            .Where(c => c.OwnerId == userId && c.IsCompleted)
             .SumAsync(c => c.Points, cancellationToken);
 
         return new ChallengeCompletionResult(

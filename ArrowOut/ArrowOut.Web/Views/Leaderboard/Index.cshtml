@@ -1,23 +1,18 @@
 @model LeaderboardViewModel
 @{
-    ViewData["Title"] = $"{Model.Option.Name} leaderboard";
+    ViewData["Title"] = "Leaderboard";
 }
 
 <h1 class="h2 mb-1">Leaderboard</h1>
-<p class="text-muted">A separate ranking for each game type, by points. Every board you clear scores once: <strong>Easy 1 point</strong>, <strong>Normal 4</strong>, <strong>Hard 10</strong>, <strong>Challenge 20</strong>. Ties are broken by stars, then fewest mistakes.</p>
+<p class="text-muted">Everyone in one ranking, by total points. Every board you clear scores once: <strong>Easy 1 point</strong>, <strong>Normal 4</strong>, <strong>Hard 10</strong>, <strong>Challenge 20</strong>. Ties are broken by stars, then fewest mistakes.</p>
 
 @* Buttons back into the game: a new random game, the board you came from, or an unfinished one. *@
 <div class="ao-leaderboard-actions mb-4">
     @if (User.Identity?.IsAuthenticated == true)
     {
         <form method="post" asp-controller="Challenge" asp-action="New" data-busy-text="Building…" class="m-0">
-            @* On the Challenge tab this starts a Challenge game, everywhere else a random one. *@
-            @if (Model.Kind == ChallengeKind.Challenge)
-            {
-                <input type="hidden" name="kind" value="@ChallengeKind.Challenge" />
-            }
             <button type="submit" class="btn btn-ao">
-                <i class="bi bi-shuffle me-1" aria-hidden="true"></i>@(Model.Kind == ChallengeKind.Challenge ? "Start new Challenge game" : "Start new game")
+                <i class="bi bi-shuffle me-1" aria-hidden="true"></i>Start new game
             </button>
         </form>
         @if (Model.FromChallengeId is { } from)
@@ -41,29 +36,11 @@
     }
 </div>
 
-@* Normal links, not JS tabs, so every ranking has its own URL, works without JavaScript and can be shared. *@
-<nav class="ao-kind-tabs mb-3" aria-label="Game type">
-    @foreach (var option in ChallengeKindOption.All)
-    {
-        var active = option.Kind == Model.Kind;
-        <a class="ao-kind-tab @option.CssClass @(active ? "is-active" : "")"
-           asp-action="Index" asp-route-kind="@option.Kind" asp-route-from="@Model.FromChallengeId"
-           aria-current="@(active ? "page" : null)">
-            <i class="bi @option.Icon" aria-hidden="true"></i>
-            <span>@option.Name</span>
-            @if (option.Arrows is not null)
-            {
-                <small>@option.Arrows</small>
-            }
-        </a>
-    }
-</nav>
-
 @if (Model.Entries.Items.Count == 0)
 {
     <div class="ao-empty text-center py-5">
         <i class="bi bi-trophy display-6 d-block mb-2"></i>
-        <p class="mb-0">No @Model.Option.Name wins yet — be the first!</p>
+        <p class="mb-0">No wins yet — be the first!</p>
     </div>
 }
 else

@@ -254,13 +254,6 @@ a:not(.btn, .nav-link, .page-link, .dropdown-item, .navbar-brand, [class*="ao-"]
     font-size: .75rem;
 }
 
-/* Leaderboard tabs */
-.ao-kind-tabs { background: var(--ao-surface); border: var(--toon-border); box-shadow: var(--toon-shadow); }
-.ao-kind-tab { font-family: var(--toon-font-display); letter-spacing: .04em; font-weight: 400; font-size: 1.05rem; border: 2.5px solid transparent; }
-.ao-kind-tab small { font-family: var(--toon-font-body); letter-spacing: 0; font-weight: 600; }
-.ao-kind-tab.is-active { background: var(--kind); color: var(--toon-sticker-text, #fff); border-color: var(--toon-ink); box-shadow: var(--toon-shadow-sm); }
-.ao-kind-tab.is-active small { opacity: 1; }
-
 /* ---------- Tables, medals, stats ---------- */
 
 .ao-table thead th { font-family: var(--toon-font-display); font-weight: 400; letter-spacing: .05em; font-size: .95rem; color: var(--ao-text); border-bottom: var(--toon-border); }

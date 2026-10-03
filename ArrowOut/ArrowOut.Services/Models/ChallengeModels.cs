@@ -8,7 +8,7 @@ public sealed record ChallengeBoardDto(int Id, int Width, int Height, int MaxLiv
 
 // A checked win. Points = what the board is worth (Easy 1, Normal 4, Hard 10, Challenge 20).
 // PointsGained = how much your total went up (0 if you'd already won this board).
-// TotalPoints = your new total for this kind.
+// TotalPoints = your new total over all games (what the leaderboard shows).
 public sealed record ChallengeCompletionResult(
     int ChallengeId, int Stars, int Mistakes, bool IsNewBest, bool IsFirstCompletion,
     int Points, int PointsGained, int HintsUsed, int TotalPoints);

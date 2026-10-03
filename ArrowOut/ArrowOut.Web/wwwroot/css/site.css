@@ -323,45 +323,6 @@ a.ao-level-card:focus-visible { transform: translateY(-2px); box-shadow: 0 6px 2
     background: color-mix(in srgb, var(--kind) 14%, transparent);
 }
 
-/* Leaderboard tabs, one ranking per kind. */
-.ao-kind-tabs {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: .5rem;
-    padding: .35rem;
-    border-radius: calc(var(--ao-radius) + 4px);
-    background: color-mix(in srgb, var(--ao-grid) 30%, transparent);
-    max-width: 36rem;
-}
-
-.ao-kind-tab {
-    --kind: var(--ao-accent);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: .15rem .45rem;
-    padding: .55rem .5rem;
-    border-radius: var(--ao-radius);
-    color: var(--ao-muted);
-    font-weight: 600;
-    text-decoration: none;
-    transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
-}
-
-.ao-kind-tab.is-easy { --kind: var(--ao-success); }
-.ao-kind-tab.is-normal { --kind: var(--ao-accent); }
-.ao-kind-tab.is-hard { --kind: var(--ao-danger); }
-.ao-kind-tab.is-challenge { --kind: #8b5cf6; }
-
-.ao-kind-tab small { font-weight: 500; font-size: .75rem; opacity: .8; width: 100%; text-align: center; }
-.ao-kind-tab:hover { color: var(--kind); }
-.ao-kind-tab.is-active { background: var(--ao-surface); color: var(--kind); box-shadow: var(--ao-shadow); }
-
-@media (min-width: 576px) {
-    .ao-kind-tab small { width: auto; }
-}
-
 /* ---------- Dark / light switch ---------- */
 body, .ao-navbar, .ao-card, .ao-feature, .ao-board, .dropdown-menu, .form-control {
     transition: background-color .25s ease, color .25s ease, border-color .25s ease;

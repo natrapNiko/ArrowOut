@@ -1,4 +1,3 @@
-using ArrowOut.Game.Generation;
 using ArrowOut.Services.Leaderboard;
 using ArrowOut.Services.Levels;
 using ArrowOut.Services.Models;
@@ -16,14 +15,11 @@ public class ProgressApiController(ILevelService levelService, ILeaderboardServi
     public async Task<ActionResult<ProgressSummary>> GetProgress(CancellationToken cancellationToken) =>
         Ok(await levelService.GetProgressSummaryAsync(CurrentUserId, cancellationToken));
 
-    // GET /api/leaderboard?kind=Easy|Normal|Hard|Challenge&page=&pageSize=: public, no login needed.
+    // GET /api/leaderboard?page=&pageSize=: the one ranking for all games. Public, no login needed.
     [HttpGet("leaderboard")]
     [AllowAnonymous]
     [ProducesResponseType<PagedResult<LeaderboardEntry>>(StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResult<LeaderboardEntry>>> GetLeaderboard(
-        [FromQuery] ChallengeKind kind = ChallengeKind.Easy, [FromQuery] int page = 1, [FromQuery] int pageSize = 20,
-        CancellationToken cancellationToken = default) =>
-        Enum.IsDefined(kind)
-            ? Ok(await leaderboardService.GetPageAsync(kind, page, pageSize, cancellationToken))
-            : BadRequest();
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default) =>
+        Ok(await leaderboardService.GetPageAsync(page, pageSize, cancellationToken));
 }

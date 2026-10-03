@@ -162,8 +162,9 @@ into your last unfinished board.
 
 ## Leaderboard
 
-There's a separate leaderboard for Easy, Normal, Hard and Challenge games. Players are ranked by points first, then by number
-of wins, then by stars, and finally by who made the fewest mistakes. It never shows e-mail addresses. If
+There's just one leaderboard for everyone. Every win adds its points to your total, no matter which kind
+of game it was, so harder boards count for more. Players are ranked by total points first, then by number of
+wins, then by stars, and finally by who made the fewest mistakes. It never shows e-mail addresses. If
 someone hasn't set a display name, only the first two letters of their e-mail are shown, followed by `***`.
 Admin accounts are left out completely.
 
@@ -280,14 +281,14 @@ scripts add for you.
 |---|---|---|
 | POST | `/game/new` | Starts a new board and redirects to it. No `kind` = random Easy/Normal/Hard, `kind=Challenge` = Challenge game |
 | GET | `/game/{id}` | The game page for one of your boards |
-| GET | `/leaderboard?kind=&page=` | The leaderboard page |
+| GET | `/leaderboard?page=` | The leaderboard page |
 | POST | `/theme/mode` | Switches light or dark mode (form fields `mode` and `returnUrl`) |
 | GET | `/api/games/{id}` | The board layout |
 | POST | `/api/games/{id}/attempts` | Records that you started or restarted |
 | POST | `/api/games/{id}/hint` | Asks for a hint for the current board state |
 | POST | `/api/games/{id}/moves` | Checks what a tap would do, without saving anything |
 | POST | `/api/games/{id}/completion` | Sends your taps so the server can check the win |
-| GET | `/api/leaderboard?kind=&page=&pageSize=` | The leaderboard as JSON |
+| GET | `/api/leaderboard?page=&pageSize=` | The leaderboard as JSON |
 | GET | `/api/progress` | Your progress on the admin-made levels |
 | GET/POST | `/api/levels/...` | The same actions as above, for the admin-made levels |
 

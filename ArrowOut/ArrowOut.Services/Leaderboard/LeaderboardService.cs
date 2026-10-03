@@ -1,6 +1,5 @@
 using ArrowOut.Data;
 using ArrowOut.Data.Common;
-using ArrowOut.Game.Generation;
 using ArrowOut.Services.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,16 +7,17 @@ namespace ArrowOut.Services.Leaderboard;
 
 public interface ILeaderboardService
 {
-    // One ranking per kind. Only wins of that kind count.
-    Task<PagedResult<LeaderboardEntry>> GetPageAsync(ChallengeKind kind, int page, int pageSize, CancellationToken cancellationToken = default);
+    // One ranking for everyone. Wins of every kind count.
+    Task<PagedResult<LeaderboardEntry>> GetPageAsync(int page, int pageSize, CancellationToken cancellationToken = default);
 }
 
-// Separate rankings for Easy, Normal, Hard and Challenge. Sorted by points on that kind, then number of
-// wins, then stars, then fewest mistakes. It's all worked out in SQL.
+// One leaderboard for all games. The points already reflect how hard a board was (Easy 1, Normal 4,
+// Hard 10, Challenge 20), so we just add them up. Sorted by total points, then number of wins, then
+// stars, then fewest mistakes. It's all worked out in SQL.
 // Admins are left out, since their games are just testing.
 public sealed class LeaderboardService(ApplicationDbContext dbContext) : ILeaderboardService
 {
-    public async Task<PagedResult<LeaderboardEntry>> GetPageAsync(ChallengeKind kind, int page, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<PagedResult<LeaderboardEntry>> GetPageAsync(int page, int pageSize, CancellationToken cancellationToken = default)
     {
         var adminIds =
             from userRole in dbContext.UserRoles
@@ -27,7 +27,7 @@ public sealed class LeaderboardService(ApplicationDbContext dbContext) : ILeader
 
         var won = dbContext.Challenges
             .AsNoTracking()
-            .Where(c => c.IsCompleted && c.Kind == kind && !adminIds.Contains(c.OwnerId));
+            .Where(c => c.IsCompleted && !adminIds.Contains(c.OwnerId));
 
         var total = await won.Select(c => c.OwnerId).Distinct().CountAsync(cancellationToken);
         var size = PagedResult<LeaderboardEntry>.NormalizePageSize(pageSize);

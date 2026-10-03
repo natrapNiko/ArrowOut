@@ -33,7 +33,7 @@ public class LeaderboardAndAnalyticsTests : IDisposable
         await TestDb.AddChallengeAsync(_db, "carol", wonWithMistakes: 0);
         await TestDb.AddChallengeAsync(_db, "dave"); // started, never won: not ranked
 
-        var page = await new LeaderboardService(_db).GetPageAsync(ChallengeKind.Easy, 1, 10);
+        var page = await new LeaderboardService(_db).GetPageAsync(1, 10);
 
         Assert.Equal(["Bob", "Carol", "Alice"], page.Items.Select(e => e.PlayerName));
         Assert.Equal([2, 1, 1], page.Items.Select(e => e.ChallengesWon));
@@ -56,7 +56,7 @@ public class LeaderboardAndAnalyticsTests : IDisposable
         await TestDb.AddChallengeAsync(_db, "admin", wonWithMistakes: 0);
         await TestDb.AddChallengeAsync(_db, "alice", wonWithMistakes: 2);
 
-        var page = await new LeaderboardService(_db).GetPageAsync(ChallengeKind.Easy, 1, 10);
+        var page = await new LeaderboardService(_db).GetPageAsync(1, 10);
 
         Assert.Equal(["Alice"], page.Items.Select(e => e.PlayerName));
         Assert.Equal(1, page.TotalCount);
@@ -77,7 +77,7 @@ public class LeaderboardAndAnalyticsTests : IDisposable
         await TestDb.AddChallengeAsync(_db, "bob", wonWithMistakes: 0, kind: ChallengeKind.Normal);
         await TestDb.AddChallengeAsync(_db, "carol", wonWithMistakes: 0, kind: ChallengeKind.Normal);
 
-        var page = await new LeaderboardService(_db).GetPageAsync(ChallengeKind.Normal, 1, 10);
+        var page = await new LeaderboardService(_db).GetPageAsync(1, 10);
 
         Assert.Equal(
             [("Bob", 8, 2), ("Alice", 8, 2), ("Carol", 4, 1)],
@@ -85,25 +85,24 @@ public class LeaderboardAndAnalyticsTests : IDisposable
     }
 
     [Fact]
-    public async Task Leaderboard_KeepsASeparateRankingPerChallengeKind()
+    public async Task Leaderboard_IsOneRanking_ThatAddsUpPointsFromEveryKind()
     {
         await TestDb.AddUserAsync(_db, "alice", "Alice");
         await TestDb.AddUserAsync(_db, "bob", "Bob");
+        await TestDb.AddUserAsync(_db, "carol", "Carol");
 
-        // Alice farms easy boards, Bob wins the one hard board.
+        // Alice farms easy boards (3 x 1), Bob wins one hard board (10), Carol one Challenge game (20).
         await TestDb.AddChallengeAsync(_db, "alice", wonWithMistakes: 0, kind: ChallengeKind.Easy);
         await TestDb.AddChallengeAsync(_db, "alice", wonWithMistakes: 0, kind: ChallengeKind.Easy);
         await TestDb.AddChallengeAsync(_db, "alice", wonWithMistakes: 0, kind: ChallengeKind.Easy);
         await TestDb.AddChallengeAsync(_db, "bob", wonWithMistakes: 1, kind: ChallengeKind.Hard);
+        await TestDb.AddChallengeAsync(_db, "carol", wonWithMistakes: 2, kind: ChallengeKind.Challenge);
 
-        var service = new LeaderboardService(_db);
-        var easy = await service.GetPageAsync(ChallengeKind.Easy, 1, 10);
-        var medium = await service.GetPageAsync(ChallengeKind.Normal, 1, 10);
-        var hard = await service.GetPageAsync(ChallengeKind.Hard, 1, 10);
+        var page = await new LeaderboardService(_db).GetPageAsync(1, 10);
 
-        Assert.Equal([("Alice", 3)], easy.Items.Select(e => (e.PlayerName, e.ChallengesWon)));
-        Assert.Empty(medium.Items);
-        Assert.Equal([("Bob", 1)], hard.Items.Select(e => (e.PlayerName, e.ChallengesWon)));
+        Assert.Equal(
+            [("Carol", 20, 1), ("Bob", 10, 1), ("Alice", 3, 3)],
+            page.Items.Select(e => (e.PlayerName, e.TotalPoints, e.ChallengesWon)));
     }
 
     [Fact]
@@ -115,7 +114,7 @@ public class LeaderboardAndAnalyticsTests : IDisposable
             await TestDb.AddChallengeAsync(_db, $"user{i}", wonWithMistakes: 0);
         }
 
-        var page = await new LeaderboardService(_db).GetPageAsync(ChallengeKind.Easy, 2, 2);
+        var page = await new LeaderboardService(_db).GetPageAsync(2, 2);
 
         Assert.Equal([3, 4], page.Items.Select(e => e.Rank));
     }
